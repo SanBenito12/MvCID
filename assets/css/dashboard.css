@@ -1,0 +1,645 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 20px 30px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+    color: white;
+    font-size: 2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header h1 i {
+    font-size: 2.5rem;
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.logout-btn {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+/* Form Container */
+.form-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 40px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.form-container h2 {
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    text-align: center;
+    position: relative;
+}
+
+.form-container h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 2px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    color: #555;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid #e1e5e9;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.1);
+}
+
+/* Asegura que el contenedor del curso tenga una altura fija y espacio para el botón */
+.curso {
+    display: flex;
+    flex-direction: column;
+    min-height: 650px; /* Ajusta según necesidad */
+}
+
+/* Hace que la información del curso ocupe todo el espacio disponible */
+.curso-info {
+    flex-grow: 1;
+}
+
+/* Estilos específicos para el formulario de compra */
+.curso-compra {
+    margin-top: auto; /* Empuja el botón hacia abajo */
+    padding-top: 20px;
+    text-align: center;
+}
+
+.curso-compra .btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Ajusta la imagen para que no sea demasiado grande */
+.curso-imagen img {
+    max-height: 200px;
+    object-fit: contain;
+    background: #f5f5f5;
+    border-radius: 8px;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 5px;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #56cc9d, #6be585);
+    color: white;
+    box-shadow: 0 8px 25px rgba(86, 204, 157, 0.3);
+}
+
+.btn-success:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(86, 204, 157, 0.4);
+}
+
+.btn-warning {
+    background: linear-gradient(45deg, #ffb347, #ff8c42);
+    color: white;
+    box-shadow: 0 8px 25px rgba(255, 179, 71, 0.3);
+}
+
+.btn-warning:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(255, 179, 71, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+    color: white;
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+}
+
+.btn-danger:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+    color: white;
+    box-shadow: 0 8px 25px rgba(149, 165, 166, 0.3);
+}
+
+/* Messages */
+.mensaje {
+    background: linear-gradient(45deg, #56cc9d, #6be585);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(86, 204, 157, 0.2);
+    animation: slideInDown 0.5s ease;
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Courses Section */
+.courses-header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 20px 30px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.courses-header h2 {
+    color: white;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.courses-header i {
+    font-size: 2rem;
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 25px;
+}
+
+.curso {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.curso::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+}
+
+.curso:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+}
+
+.curso-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.curso-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .courses-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .curso-actions {
+        flex-direction: column;
+    }
+}
+
+/* Animations */
+.curso {
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Estilos adicionales para Cursos Disponibles y Mis Compras */
+
+.curso-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 100%;
+}
+
+.curso-info h3 {
+    color: #333;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.curso-info p {
+    color: #666;
+    font-size: 1rem;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.curso-imagen {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.curso-imagen:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.curso-imagen img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.curso-precio {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0;
+}
+
+.precio {
+    background: linear-gradient(45deg, #56cc9d, #6be585);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    box-shadow: 0 8px 25px rgba(86, 204, 157, 0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.curso-compra {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    border-top: 2px solid rgba(102, 126, 234, 0.1);
+}
+
+.curso-compra .btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 1.1rem;
+    padding: 18px 30px;
+    min-height: 60px;
+    display: flex !important;
+    align-items: center;
+    text-align: center;
+}
+
+.curso-compra .btn i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.curso-compra-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+    padding: 20px;
+    background: linear-gradient(45deg, rgba(86, 204, 157, 0.1), rgba(107, 229, 133, 0.1));
+    border-radius: 12px;
+    border: 2px solid rgba(86, 204, 157, 0.2);
+}
+
+.precio-pagado, .fecha-compra {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #333;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.precio-pagado i {
+    color: #56cc9d;
+    font-size: 1.2rem;
+}
+
+.fecha-compra i {
+    color: #667eea;
+    font-size: 1.2rem;
+}
+
+.precio-pagado {
+    font-size: 1.2rem;
+    color: #56cc9d;
+}
+
+/* Badge de estado para compras */
+.curso-comprado {
+    position: relative;
+}
+
+.curso-comprado::after {
+    content: 'ADQUIRIDO';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(45deg, #56cc9d, #6be585);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(86, 204, 157, 0.3);
+}
+
+/* Animación especial para cursos disponibles */
+.curso-disponible {
+    position: relative;
+    overflow: hidden;
+}
+
+.curso-disponible::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #667eea, #764ba2, #56cc9d, #6be585);
+    border-radius: 22px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.curso-disponible:hover::before {
+    opacity: 1;
+}
+
+.curso-disponible:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+/* Responsive adicional */
+@media (max-width: 768px) {
+    .curso-imagen img {
+        height: 150px;
+    }
+    
+    .curso-info h3 {
+        font-size: 1.2rem;
+    }
+    
+    .precio {
+        font-size: 1.1rem;
+        padding: 10px 20px;
+    }
+    
+    .curso-compra-info {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Efecto hover mejorado para botones de compra */
+.curso-compra .btn-primary:hover {
+    background: linear-gradient(45deg, #764ba2, #667eea);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+}
+
+/* Separador visual entre secciones */
+.courses-header + .courses-header {
+    margin-top: 50px;
+}
+
+.courses-grid + .courses-header {
+    margin-top: 50px;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.metodo-pago {
+    color: #007bff;
+    font-weight: 500;
+    margin: 5px 0;
+}
+
+.curso-compra {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+}
