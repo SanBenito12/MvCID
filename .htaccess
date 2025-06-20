@@ -1,24 +1,13 @@
 RewriteEngine On
 
-# Redirigir la raíz a index.php
-RewriteRule ^$ /frontend/index.php [L]
+# Habilitar logs de error para debug
+LogLevel alert rewrite:trace6
 
-# Rutas para el frontend
-RewriteRule ^login/?$ /frontend/login.php [L]
-RewriteRule ^registro/?$ /frontend/registro.php [L]
-RewriteRule ^dashboard/?$ /frontend/dashboard.php [L]
-RewriteRule ^logout/?$ /frontend/logout.php [L]
+# Servir archivos estáticos directamente
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^assets/ - [L]
 
-# API Routes
-RewriteRule ^api/clientes/login/?$ /backend/api/clientes.php [L]
-RewriteRule ^api/clientes/register/?$ /backend/api/clientes.php [L]
-RewriteRule ^api/clientes/profile/?$ /backend/api/clientes.php [L]
-RewriteRule ^api/clientes/?$ /backend/api/clientes.php [L]
-
-# Servir archivos estáticos (CSS, JS, imágenes)
-RewriteRule ^assets/(.*)$ /assets/$1 [L]
-
-# Si no es un archivo existente, mostrar 404
+# Redirigir todo lo demás al router
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /frontend/404.php [L]
+RewriteRule ^(.*)$ router.php [QSA,L]

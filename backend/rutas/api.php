@@ -39,7 +39,7 @@ switch ($route) {
         require_once __DIR__ . "/../api/cursos.php";
         break;
         
-    case "PUT /cursos":
+    case "PATCH /cursos":
         require_once __DIR__ . "/../api/cursos.php";
         break;
         

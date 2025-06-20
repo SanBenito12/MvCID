@@ -1,5 +1,6 @@
 <?php
-require_once '../includes/db.php';
+// backend/api/auth.php
+require_once __DIR__ . '/../includes/db.php';
 
 header("Content-Type: application/json");
 
@@ -19,3 +20,4 @@ if ($res["status"] === 200 && count($res["body"]) > 0) {
 } else {
     echo json_encode(["valido" => false]);
 }
+?>

@@ -1,5 +1,6 @@
 <?php
-require_once '../includes/db.php';
+// backend/api/compras.php
+require_once __DIR__ . '/../includes/db.php';
 
 header("Content-Type: application/json");
 
@@ -28,3 +29,4 @@ switch ($method) {
         http_response_code(405);
         echo json_encode(["error" => "Método no permitido"]);
 }
+?>

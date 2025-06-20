@@ -9,16 +9,28 @@ function supabaseRequest($endpoint, $method = "GET", $data = null) {
     $headers = [
         "apikey: " . SUPABASE_KEY,
         "Authorization: Bearer " . SUPABASE_KEY,
-        "Content-Type: application/json"
+        "Content-Type: application/json",
+        "Prefer: return=representation"
     ];
 
     $url = SUPABASE_URL . "/rest/v1/" . $endpoint;
+
+    // Log para debug
+    error_log("Supabase Request - URL: $url");
+    error_log("Supabase Request - Method: $method");
+    if ($data) {
+        error_log("Supabase Request - Data: " . json_encode($data));
+    }
 
     $options = [
         CURLOPT_URL => $url,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CUSTOMREQUEST => $method,
-        CURLOPT_HTTPHEADER => $headers
+        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_FOLLOWLOCATION => true
     ];
 
     if ($data !== null) {
@@ -30,16 +42,35 @@ function supabaseRequest($endpoint, $method = "GET", $data = null) {
     $response = curl_exec($curl);
     $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     $error = curl_error($curl);
+    
+    // Log de respuesta
+    error_log("Supabase Response - Status: $httpcode");
+    error_log("Supabase Response - Body: " . substr($response, 0, 500));
+    
+    if ($error) {
+        error_log("Supabase cURL Error: $error");
+    }
+    
     curl_close($curl);
 
-    // // 🔍 Depuración temporal (comenta esto en producción)
-    // if ($error) {
-    //     echo "❌ cURL error: " . $error . "<br>";
-    // }
+    // Manejo de errores de cURL
+    if ($error) {
+        throw new Exception("Error de conexión: $error");
+    }
+
+    // Decodificar respuesta
+    $decodedResponse = json_decode($response, true);
+    
+    // Si no se puede decodificar JSON, devolver respuesta cruda
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("JSON Decode Error: " . json_last_error_msg());
+        $decodedResponse = null;
+    }
 
     return [
         "status" => $httpcode,
-        "body" => json_decode($response, true),
-        "raw" => $response // Devuelve también el texto bruto por si hay errores de JSON
+        "body" => $decodedResponse,
+        "raw" => $response
     ];
 }
+?>
