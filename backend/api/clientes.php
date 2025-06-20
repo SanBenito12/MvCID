@@ -1,10 +1,13 @@
 <?php
-// backend/api/clientes.php - Versión final funcionando
+// backend/api/clientes.php - API actualizada con controladores separados
 session_start();
 header('Content-Type: application/json');
 
-// Incluir la conexión a la base de datos usando ruta absoluta
-require_once __DIR__ . '/../includes/db.php';
+// Incluir el controlador
+require_once __DIR__ . '/../controladores/ClientesController.php';
+
+// Crear instancia del controlador
+$controller = new ClientesController();
 
 // Obtener método y datos
 $method = $_SERVER['REQUEST_METHOD'];
@@ -16,9 +19,9 @@ try {
         $accion = $_GET['accion'] ?? $input['accion'] ?? null;
 
         if ($accion === 'login') {
-            handleLogin($input);
+            handleLogin($controller, $input);
         } elseif ($accion === 'registro') {
-            handleRegister($input);
+            handleRegister($controller, $input);
         } else {
             http_response_code(400);
             echo json_encode([
@@ -27,7 +30,11 @@ try {
             ]);
         }
     } elseif ($method === 'GET') {
-        getAllClients();
+        handleGet($controller);
+    } elseif ($method === 'PATCH') {
+        handleUpdate($controller, $input);
+    } elseif ($method === 'DELETE') {
+        handleDelete($controller);
     } else {
         http_response_code(405);
         echo json_encode(['success' => false, 'message' => 'Método no permitido']);
@@ -41,157 +48,219 @@ try {
     ]);
 }
 
-function handleLogin($input) {
+/**
+ * Manejar login
+ */
+function handleLogin($controller, $input) {
     if (!$input || !isset($input['email'])) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Email es requerido']);
         return;
     }
 
-    $email = filter_var($input['email'], FILTER_VALIDATE_EMAIL);
+    $resultado = $controller->login($input['email']);
 
-    if (!$email) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Email inválido']);
-        return;
-    }
-
-    try {
-        // Buscar el cliente en Supabase
-        $endpoint = "clientes?email=eq." . urlencode($email) . "&select=*";
-        $response = supabaseRequest($endpoint, "GET");
-
-        if ($response['status'] !== 200) {
-            throw new Exception('Error al consultar la base de datos');
-        }
-
-        $clientes = $response['body'];
-
-        if (empty($clientes)) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'Email no registrado']);
-            return;
-        }
-
-        $cliente = $clientes[0];
-
+    if ($resultado['success']) {
         // Crear sesión
-        $_SESSION['id_cliente'] = $cliente['id_cliente'] ?? $cliente['id'];
-        $_SESSION['llave_secreta'] = $cliente['llave_secreta'] ?? 'temp_' . $cliente['id'];
-        $_SESSION['email'] = $cliente['email'];
-        $_SESSION['nombre'] = $cliente['nombre'];
-        $_SESSION['apellido'] = $cliente['apellido'];
+        $_SESSION['id_cliente'] = $resultado['id_cliente'];
+        $_SESSION['llave_secreta'] = $resultado['llave_secreta'];
+        $_SESSION['email'] = $resultado['cliente']['email'];
+        $_SESSION['nombre'] = $resultado['cliente']['nombre'];
+        $_SESSION['apellido'] = $resultado['cliente']['apellido'];
 
-        // Respuesta exitosa
+        http_response_code(200);
         echo json_encode([
             'success' => true,
             'message' => 'Login exitoso',
             'data' => [
-                'id' => $cliente['id'],
-                'email' => $cliente['email'],
-                'nombre' => $cliente['nombre'],
-                'apellido' => $cliente['apellido']
+                'id' => $resultado['cliente']['id'],
+                'email' => $resultado['cliente']['email'],
+                'nombre' => $resultado['cliente']['nombre'],
+                'apellido' => $resultado['cliente']['apellido']
             ]
         ]);
-
-    } catch (Exception $e) {
-        http_response_code(500);
+    } else {
+        http_response_code(401);
         echo json_encode([
             'success' => false,
-            'message' => 'Error en el servidor: ' . $e->getMessage()
+            'message' => $resultado['error']
         ]);
     }
 }
 
-function handleRegister($input) {
+/**
+ * Manejar registro
+ */
+function handleRegister($controller, $input) {
     if (!$input || !isset($input['email']) || !isset($input['nombre']) || !isset($input['apellido'])) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Todos los campos son requeridos']);
         return;
     }
 
-    $email = filter_var($input['email'], FILTER_VALIDATE_EMAIL);
-    $nombre = trim($input['nombre']);
-    $apellido = trim($input['apellido']);
+    $resultado = $controller->registrar($input['nombre'], $input['apellido'], $input['email']);
 
-    if (!$email || empty($nombre) || empty($apellido)) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Datos inválidos']);
-        return;
-    }
-
-    try {
-        // Verificar si el email ya existe
-        $checkEndpoint = "clientes?email=eq." . urlencode($email) . "&select=id";
-        $checkResponse = supabaseRequest($checkEndpoint, "GET");
-
-        if ($checkResponse['status'] !== 200) {
-            throw new Exception('Error al verificar email');
-        }
-
-        if (!empty($checkResponse['body'])) {
-            http_response_code(409);
-            echo json_encode(['success' => false, 'message' => 'El email ya está registrado']);
-            return;
-        }
-
-        // Generar claves para compatibilidad
-        $id_cliente = bin2hex(random_bytes(16));
-        $llave_secreta = bin2hex(random_bytes(16));
-
-        // Crear nuevo cliente
-        $newCliente = [
-            'email' => $email,
-            'nombre' => $nombre,
-            'apellido' => $apellido,
-            'id_cliente' => $id_cliente,
-            'llave_secreta' => $llave_secreta,
-            'created_at' => date('c'),
-            'updated_at' => date('c')
-        ];
-
-        $response = supabaseRequest("clientes", "POST", $newCliente);
-
-        if ($response['status'] !== 201) {
-            throw new Exception('Error al crear cliente');
-        }
-
-        $cliente = $response['body'][0] ?? $response['body'];
-
+    if ($resultado['success']) {
         // Crear sesión automáticamente
-        $_SESSION['id_cliente'] = $cliente['id_cliente'];
-        $_SESSION['llave_secreta'] = $cliente['llave_secreta'];
-        $_SESSION['email'] = $cliente['email'];
-        $_SESSION['nombre'] = $cliente['nombre'];
-        $_SESSION['apellido'] = $cliente['apellido'];
+        $_SESSION['id_cliente'] = $resultado['id_cliente'];
+        $_SESSION['llave_secreta'] = $resultado['llave_secreta'];
+        $_SESSION['email'] = $resultado['cliente']['email'];
+        $_SESSION['nombre'] = $resultado['cliente']['nombre'];
+        $_SESSION['apellido'] = $resultado['cliente']['apellido'];
 
+        http_response_code(201);
         echo json_encode([
             'success' => true,
             'message' => 'Registro exitoso',
             'data' => [
-                'id' => $cliente['id'] ?? null,
-                'email' => $cliente['email'],
-                'nombre' => $cliente['nombre'],
-                'apellido' => $cliente['apellido']
+                'id' => $resultado['cliente']['id'] ?? null,
+                'email' => $resultado['cliente']['email'],
+                'nombre' => $resultado['cliente']['nombre'],
+                'apellido' => $resultado['cliente']['apellido']
             ]
         ]);
-
-    } catch (Exception $e) {
-        http_response_code(500);
+    } else {
+        $statusCode = (strpos($resultado['error'], 'ya está registrado') !== false) ? 409 : 400;
+        http_response_code($statusCode);
         echo json_encode([
             'success' => false,
-            'message' => 'Error en el servidor: ' . $e->getMessage()
+            'message' => $resultado['error']
         ]);
     }
 }
 
-function getAllClients() {
-    try {
-        $response = supabaseRequest("clientes?select=id,email,nombre,apellido,created_at");
-        echo json_encode($response['body']);
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['error' => $e->getMessage()]);
+/**
+ * Manejar GET - Obtener clientes o perfil
+ */
+function handleGet($controller) {
+    $id = $_GET['id'] ?? null;
+    $perfil = $_GET['perfil'] ?? false;
+    $id_cliente = $_GET['id_cliente'] ?? null;
+    $llave_secreta = $_GET['llave_secreta'] ?? null;
+
+    if ($perfil && $id_cliente && $llave_secreta) {
+        // Obtener perfil completo
+        $resultado = $controller->obtenerPerfil($id_cliente, $llave_secreta);
+
+        if ($resultado['success']) {
+            echo json_encode($resultado);
+        } else {
+            http_response_code(401);
+            echo json_encode($resultado);
+        }
+    } elseif ($id) {
+        // Obtener cliente específico
+        $resultado = $controller->obtenerPorId($id);
+
+        if ($resultado['success']) {
+            echo json_encode($resultado);
+        } else {
+            http_response_code(404);
+            echo json_encode($resultado);
+        }
+    } else {
+        // Obtener todos los clientes
+        $resultado = $controller->obtenerTodos();
+
+        if ($resultado['success']) {
+            echo json_encode($resultado['clientes']);
+        } else {
+            http_response_code(500);
+            echo json_encode($resultado);
+        }
+    }
+}
+
+/**
+ * Manejar actualización
+ */
+function handleUpdate($controller, $input) {
+    $id = $_GET['id'] ?? null;
+    $id_cliente = $_GET['id_cliente'] ?? $input['id_cliente'] ?? null;
+    $llave_secreta = $_GET['llave_secreta'] ?? $input['llave_secreta'] ?? null;
+
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'ID requerido']);
+        return;
+    }
+
+    if (!$id_cliente || !$llave_secreta) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Credenciales requeridas']);
+        return;
+    }
+
+    // Validar que el usuario puede actualizar este perfil
+    $validacion = $controller->validarCredenciales($id_cliente, $llave_secreta);
+    if (!$validacion['success']) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Credenciales inválidas']);
+        return;
+    }
+
+    if ($validacion['cliente']['id'] != $id) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'No puedes actualizar este perfil']);
+        return;
+    }
+
+    // Eliminar credenciales del input para actualización
+    unset($input['id_cliente'], $input['llave_secreta']);
+
+    $resultado = $controller->actualizar($id, $input);
+
+    if ($resultado['success']) {
+        echo json_encode($resultado);
+    } else {
+        http_response_code(400);
+        echo json_encode($resultado);
+    }
+}
+
+/**
+ * Manejar eliminación
+ */
+function handleDelete($controller) {
+    $id = $_GET['id'] ?? null;
+    $id_cliente = $_GET['id_cliente'] ?? null;
+    $llave_secreta = $_GET['llave_secreta'] ?? null;
+
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'ID requerido']);
+        return;
+    }
+
+    if (!$id_cliente || !$llave_secreta) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Credenciales requeridas']);
+        return;
+    }
+
+    // Validar que el usuario puede eliminar este perfil
+    $validacion = $controller->validarCredenciales($id_cliente, $llave_secreta);
+    if (!$validacion['success']) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Credenciales inválidas']);
+        return;
+    }
+
+    if ($validacion['cliente']['id'] != $id) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'No puedes eliminar este perfil']);
+        return;
+    }
+
+    $resultado = $controller->eliminar($id);
+
+    if ($resultado['success']) {
+        // Destruir sesión si el usuario se elimina a sí mismo
+        session_destroy();
+        echo json_encode($resultado);
+    } else {
+        http_response_code(400);
+        echo json_encode($resultado);
     }
 }
 ?>

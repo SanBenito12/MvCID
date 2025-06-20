@@ -73,6 +73,21 @@ switch ($uri) {
     case '/logout.php':
         require_once __DIR__ . '/frontend/logout.php';
         exit;
+
+    case '/debug-dashboard':
+    case '/debug-dashboard.php':
+        require_once __DIR__ . '/debug-dashboard.php';
+        exit;
+
+    case '/test-metodos':
+    case '/test-metodos.php':
+        require_once __DIR__ . '/test-metodos.php';
+        exit;
+
+    case '/api-metodos':
+    case '/api-metodos.php':
+        require_once __DIR__ . '/api-metodos.php';
+        exit;
 }
 
 // === RUTAS DE API ===
@@ -124,12 +139,6 @@ if (strpos($uri, '/api/') === 0) {
         // Ruta de autenticación
         if (preg_match('#^/api/auth/?$#', $uri)) {
             require_once __DIR__ . '/backend/api/auth.php';
-            exit;
-        }
-
-        // Rutas de métodos de pago
-        if (preg_match('#^/backend/api/metodos_pago\.php$#', $uri)) {
-            require_once __DIR__ . '/backend/api/metodos_pago.php';
             exit;
         }
 
