@@ -1,13 +1,42 @@
+# .htaccess - Configuración para Apache
 RewriteEngine On
 
-# Habilitar logs de error para debug
-LogLevel alert rewrite:trace6
+# Habilitar logs para debug (comentar en producción)
+# LogLevel alert rewrite:trace6
 
-# Servir archivos estáticos directamente
+# Servir archivos estáticos directamente (CSS, JS, imágenes, fuentes)
 RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^assets/ - [L]
+RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|otf|eot)$ [NC]
+RewriteRule ^ - [L]
 
-# Redirigir todo lo demás al router
+# Redirigir todo lo demás al index.php (nuestro router)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ router.php [QSA,L]
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Configuraciones adicionales
+DirectoryIndex index.php
+
+# Seguridad - Bloquear acceso a archivos sensibles
+<Files ~ "^\.">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files ~ "\.php$">
+    # Permitir archivos PHP en frontend
+    <If "%{REQUEST_URI} =~ m#^/frontend/#">
+        Order deny,allow
+        Deny from all
+    </If>
+</Files>
+
+# Headers de seguridad
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+
+# Configuración de tipos MIME
+AddType text/css .css
+AddType application/javascript .js
+AddType image/svg+xml .svg
