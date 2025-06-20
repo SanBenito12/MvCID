@@ -1,5 +1,4 @@
 <?php
-// index.php - Router principal para servidor de desarrollo
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -35,7 +34,6 @@ if (preg_match('/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf)$/', $uri)) {
         readfile($filePath);
         exit;
     }
-    // Si el archivo no existe, devolver 404
     http_response_code(404);
     echo "Archivo no encontrado: $uri";
     exit;

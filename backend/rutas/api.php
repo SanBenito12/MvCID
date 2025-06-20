@@ -1,16 +1,13 @@
 <?php
-// /backend/rutas/api.php
 require_once __DIR__ . '/../includes/db.php';
 
-// Obtener la ruta desde el router principal
 $route = $_SERVER['API_ROUTE'] ?? '';
 
-// Si no viene del router, construir la ruta manualmente
 if (empty($route)) {
     $uri = $_SERVER['REQUEST_URI'];
     $method = $_SERVER['REQUEST_METHOD'];
     $route = "$method $uri";
-    $route = strtok($route, '?'); // Remover query string
+    $route = strtok($route, '?');
 }
 
 // Enrutamiento

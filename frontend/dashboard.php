@@ -608,10 +608,7 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
             // Intentar múltiples rutas en orden de prioridad
             const rutas = [
                 '/api-metodos.php',
-                '/api-metodos',
-                '/backend/api/metodos_pago_simple.php',
-                '/api/metodos_pago',
-                '/backend/api/metodos_pago.php'
+                '/api-metodos'
             ];
 
             let metodosObtenidos = false;

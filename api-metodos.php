@@ -1,5 +1,4 @@
 <?php
-// api-metodos.php - API simple para métodos de pago en la raíz
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET");
