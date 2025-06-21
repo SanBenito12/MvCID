@@ -177,32 +177,5 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['llave_secreta'])) {
     });
 </script>
 
-<style>
-    .mensaje {
-        margin-top: 20px;
-        padding: 15px;
-        border-radius: 8px;
-        text-align: center;
-        font-weight: 500;
-    }
-
-    .mensaje-exito {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-
-    .mensaje-error {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-
-    .loading {
-        opacity: 0.7;
-        pointer-events: none;
-    }
-</style>
-
 </body>
 </html>

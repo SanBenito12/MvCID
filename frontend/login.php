@@ -147,49 +147,5 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['llave_secreta'])) {
     });
 </script>
 
-<style>
-    .mensaje {
-        margin-top: 20px;
-        padding: 15px;
-        border-radius: 8px;
-        text-align: center;
-        font-weight: 500;
-        animation: slideIn 0.3s ease-out;
-    }
-
-    .mensaje-exito {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-
-    .mensaje-error {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-
-    .loading {
-        opacity: 0.7;
-        pointer-events: none;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .login-btn:disabled {
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-</style>
-
 </body>
 </html>

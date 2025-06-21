@@ -1,3 +1,66 @@
+/* ===============================================
+   REGISTRO CSS - TEMA OSCURO MODERNO CONSISTENTE
+   =============================================== */
+
+/* Variables CSS para mantener consistencia con dashboard */
+:root {
+    /* Colores principales */
+    --primary-bg: #0f0f1a;
+    --secondary-bg: #1a1a2e;
+    --card-bg: #16213e;
+    --accent-bg: #0e3460;
+
+    /* Colores de texto */
+    --text-primary: #ffffff;
+    --text-secondary: #b8c5d6;
+    --text-muted: #8892a6;
+
+    /* Colores de acento */
+    --accent-blue: #00d4ff;
+    --accent-purple: #7c3aed;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --accent-red: #ef4444;
+
+    /* Gradientes */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-accent: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+
+    /* Sombras */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+
+    /* Bordes */
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-hover: rgba(255, 255, 255, 0.2);
+
+    /* Transiciones */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+
+    /* Espaciado */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+
+    /* Bordes redondeados */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 50px;
+}
+
+/* Reset y base */
 * {
     margin: 0;
     padding: 0;
@@ -5,26 +68,68 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: var(--primary-bg);
+    color: var(--text-primary);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: var(--spacing-lg);
+    position: relative;
+    overflow-x: hidden;
 }
 
-.register-container {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    padding: 50px 40px;
-    border-radius: 25px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent-bg);
+    border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-blue);
+}
+
+/* Efecto de partículas de fondo moderno */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 450px;
+    height: 100%;
+    background:
+            radial-gradient(circle at 25% 75%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 75% 25%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+            linear-gradient(135deg, var(--primary-bg) 0%, #1a1a2e 100%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ===============================================
+   CONTAINER PRINCIPAL
+   =============================================== */
+.register-container {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 520px;
     position: relative;
     overflow: hidden;
+    animation: slideInUp 0.6s ease;
 }
 
 .register-container::before {
@@ -33,144 +138,227 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 5px;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    height: 4px;
+    background: var(--gradient-accent);
 }
 
+.register-container::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.05) 0%, transparent 70%);
+    animation: rotate 25s linear infinite;
+    pointer-events: none;
+}
+
+/* ===============================================
+   HEADER
+   =============================================== */
 .register-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: var(--spacing-2xl);
+    position: relative;
+    z-index: 1;
 }
 
 .register-header h1 {
-    color: #333;
-    font-size: 2.2rem;
+    color: var(--text-primary);
+    font-size: 2.5rem;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: var(--spacing-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
+    gap: var(--spacing-lg);
 }
 
 .register-header h1 i {
-    font-size: 2.5rem;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    font-size: 3rem;
+    background: var(--gradient-accent);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: pulse 2s infinite;
 }
 
 .register-header p {
-    color: #666;
-    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
     font-weight: 500;
+    margin-top: var(--spacing-md);
 }
 
+/* ===============================================
+   FORMULARIO
+   =============================================== */
 .register-form {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: var(--spacing-xl);
+    position: relative;
+    z-index: 1;
+    margin-bottom: var(--spacing-xl);
 }
 
 .form-group {
     position: relative;
+    transition: all var(--transition-normal);
 }
 
 .form-group label {
     display: block;
-    color: #555;
-    margin-bottom: 8px;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
     font-weight: 600;
     font-size: 1rem;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-sm);
 }
 
 .form-group label i {
-    color: #667eea;
-    font-size: 1.1rem;
+    color: var(--accent-blue);
+    font-size: 1.2rem;
+    width: 20px;
 }
 
+/* Input styling moderno */
 .form-input {
     width: 100%;
-    padding: 18px 20px;
-    border: 2px solid #e1e5e9;
-    border-radius: 15px;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--secondary-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
     font-size: 1.1rem;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-primary);
+    transition: all var(--transition-normal);
     position: relative;
+    outline: none;
+    font-family: inherit;
 }
 
 .form-input:focus {
-    outline: none;
-    border-color: #667eea;
+    border-color: var(--accent-blue);
+    background: var(--accent-bg);
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
-    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 10px 25px rgba(0, 212, 255, 0.2);
 }
 
 .form-input::placeholder {
-    color: #aaa;
+    color: var(--text-muted);
     font-weight: 400;
+    font-style: italic;
 }
 
+/* Estados de input */
+.form-input:invalid {
+    border-color: var(--accent-red);
+}
+
+.form-input:valid {
+    border-color: var(--accent-green);
+}
+
+/* Efectos especiales para inputs */
+.form-input:focus + .form-group::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+/* ===============================================
+   BOTÓN DE REGISTRO
+   =============================================== */
 .register-btn {
-    padding: 18px 30px;
+    padding: var(--spacing-lg) var(--spacing-xl);
     border: none;
-    border-radius: 15px;
+    border-radius: var(--radius-lg);
     font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    transition: all var(--transition-normal);
+    background: var(--gradient-accent);
     color: white;
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    box-shadow: var(--shadow-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    margin-top: 15px;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
     text-transform: uppercase;
     letter-spacing: 1px;
+    min-height: 60px;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+}
+
+.register-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.register-btn:hover::before {
+    left: 100%;
 }
 
 .register-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-    background: linear-gradient(45deg, #764ba2, #667eea);
+    box-shadow: var(--shadow-xl);
+    filter: brightness(1.1);
 }
 
 .register-btn:active {
     transform: translateY(-1px);
 }
 
+.register-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
 .register-btn i {
     font-size: 1.3rem;
 }
 
-/* Enlace de login */
+/* ===============================================
+   ENLACE DE LOGIN
+   =============================================== */
 .login-link {
     text-align: center;
-    margin-top: 25px;
-    padding: 15px 0;
+    padding: var(--spacing-lg) 0;
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border-color);
+    margin-top: var(--spacing-lg);
 }
 
 .login-link a {
-    color: #667eea;
+    color: var(--accent-blue);
     text-decoration: none;
     font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    transition: all var(--transition-normal);
     position: relative;
     display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
 }
 
 .login-link a:hover {
-    color: #764ba2;
+    color: var(--text-primary);
+    background: var(--accent-bg);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .login-link a::after {
@@ -178,112 +366,375 @@ body {
     position: absolute;
     width: 0;
     height: 2px;
-    bottom: -3px;
+    bottom: 2px;
     left: 50%;
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    transition: all 0.3s ease;
+    background: var(--gradient-accent);
+    transition: all var(--transition-normal);
     transform: translateX(-50%);
 }
 
 .login-link a:hover::after {
-    width: 100%;
+    width: 80%;
 }
 
-/* Mensaje de error */
-.mensaje-error {
-    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
-    color: white;
-    padding: 15px 20px;
-    border-radius: 12px;
-    margin-top: 25px;
+/* ===============================================
+   MENSAJES
+   =============================================== */
+.mensaje {
+    margin-top: var(--spacing-xl);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-radius: var(--radius-lg);
     font-weight: 600;
     text-align: center;
-    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
-    animation: shake 0.5s ease-in-out;
+    animation: slideInDown 0.5s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: var(--spacing-md);
+    border: 1px solid;
+    position: relative;
+    z-index: 1;
 }
 
-.mensaje-error i {
+.mensaje i {
+    font-size: 1.3rem;
+}
+
+/* Tipos de mensaje con gradientes modernos */
+.mensaje-exito {
+    background: var(--gradient-success);
+    color: white;
+    border-color: var(--accent-green);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+.mensaje-error {
+    background: var(--gradient-danger);
+    color: white;
+    border-color: var(--accent-red);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    animation: shake 0.5s ease-in-out;
+}
+
+.mensaje-warning {
+    background: var(--gradient-warning);
+    color: white;
+    border-color: var(--accent-orange);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+}
+
+/* ===============================================
+   EFECTOS DE CARGA
+   =============================================== */
+.loading {
+    opacity: 0.8;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 15, 26, 0.5);
+    backdrop-filter: blur(2px);
+    border-radius: var(--radius-xl);
+}
+
+.loading .register-btn {
+    background: var(--gradient-primary);
+    opacity: 0.8;
+}
+
+/* ===============================================
+   VALIDACIÓN VISUAL
+   =============================================== */
+.form-group.success .form-input {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.form-group.error .form-input {
+    border-color: var(--accent-red);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Indicadores de validación */
+.form-group::after {
+    content: '';
+    position: absolute;
+    right: var(--spacing-lg);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    transition: all var(--transition-normal);
+}
+
+.form-group.success::after {
+    content: '✓';
+    color: var(--accent-green);
+    opacity: 1;
+    font-weight: bold;
     font-size: 1.2rem;
+}
+
+.form-group.error::after {
+    content: '✗';
+    color: var(--accent-red);
+    opacity: 1;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* ===============================================
+   ANIMACIONES
+   =============================================== */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
 }
 
-/* Efectos de carga */
-.loading {
-    opacity: 0.7;
-    pointer-events: none;
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
-.loading .register-btn {
-    background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
-/* Responsive */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--accent-blue),
+        0 0 10px var(--accent-blue),
+        0 0 15px var(--accent-blue);
+    }
+    50% {
+        box-shadow: 0 0 10px var(--accent-blue),
+        0 0 20px var(--accent-blue),
+        0 0 30px var(--accent-blue);
+    }
+}
+
+/* ===============================================
+   RESPONSIVE DESIGN
+   =============================================== */
+@media (max-width: 768px) {
+    body {
+        padding: var(--spacing-md);
+    }
+
+    .register-container {
+        padding: var(--spacing-xl);
+        max-width: 100%;
+    }
+
+    .register-header h1 {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .register-header h1 i {
+        font-size: 2.5rem;
+    }
+
+    .register-header p {
+        font-size: 1.1rem;
+    }
+
+    .form-input {
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: 1rem;
+    }
+
+    .register-btn {
+        padding: var(--spacing-lg);
+        font-size: 1.1rem;
+        min-height: 56px;
+    }
+
+    .login-link a {
+        font-size: 1rem;
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .mensaje {
+        padding: var(--spacing-md) var(--spacing-lg);
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        text-align: center;
+    }
+
+    .register-form {
+        gap: var(--spacing-lg);
+    }
+}
+
 @media (max-width: 480px) {
     .register-container {
-        padding: 40px 25px;
-        margin: 10px;
+        padding: var(--spacing-lg);
+        margin: var(--spacing-sm);
     }
-    
+
     .register-header h1 {
         font-size: 1.8rem;
     }
-    
+
     .register-header h1 i {
         font-size: 2rem;
     }
-    
+
     .form-input {
-        padding: 16px 18px;
-        font-size: 1rem;
+        padding: var(--spacing-md);
+        font-size: 0.95rem;
     }
-    
+
     .register-btn {
-        padding: 16px 25px;
-        font-size: 1.1rem;
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: 1rem;
+        letter-spacing: 0.5px;
     }
 
     .login-link a {
         font-size: 0.95rem;
     }
-}
 
-/* Animaciones de entrada */
-.register-container {
-    animation: slideInUp 0.6s ease-out;
-}
-
-@keyframes slideInUp {
-    from {
-        transform: translateY(50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
+    .register-form {
+        gap: var(--spacing-md);
     }
 }
 
-/* Efecto de partículas de fondo */
-body::before {
+/* ===============================================
+   MEJORAS DE ACCESIBILIDAD
+   =============================================== */
+.form-input:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+.register-btn:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+.login-link a:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+/* Reducir animaciones para usuarios que las prefieren */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===============================================
+   ESTADOS DE HOVER MEJORADOS
+   =============================================== */
+.form-group:hover .form-input {
+    border-color: var(--border-hover);
+}
+
+.register-container:hover {
+    box-shadow: var(--shadow-xl);
+}
+
+/* Dark mode support (adicional) */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: var(--primary-bg);
+    }
+}
+
+/* ===============================================
+   EFECTOS ESPECIALES PARA REGISTRO
+   =============================================== */
+.register-container:hover::after {
+    animation-duration: 15s;
+}
+
+.form-group:focus-within {
+    transform: scale(1.02);
+}
+
+.form-group:focus-within .form-input {
+    animation: glow 2s infinite;
+}
+
+/* Efecto de progreso de validación */
+.register-form::before {
     content: '';
-    position: fixed;
-    top: 0;
+    position: absolute;
+    top: -2px;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
+    height: 2px;
+    background: var(--gradient-accent);
+    transition: width 0.3s ease;
+    border-radius: var(--radius-sm);
 }
+
+/* ===============================================
+   UTILIDADES
+   =============================================== */
+.hidden {
+    display: none !important;
+}
+
+.show {
+    display: block !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+.slide-in-up {
+    animation: slideInUp 0.3s ease;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: var(--spacing-sm) !important; }
+.mb-2 { margin-bottom: var(--spacing-md) !important; }
+.mb-3 { margin-bottom: var(--spacing-lg) !important; }
