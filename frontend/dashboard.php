@@ -16,7 +16,6 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
     <script>
         const id_cliente = "<?= $_SESSION['id_cliente'] ?>";
         const llave_secreta = "<?= $_SESSION['llave_secreta'] ?>";
-        const SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2cGtla3NidWpmZHN6Y2twdWtpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTUxMDQ1NCwiZXhwIjoyMDY1MDg2NDU0fQ.rNXqhDiKveKgUdFnStIVer7QkpGNsSPwM_f9FheQKhQ";
     </script>
 </head>
 <body>

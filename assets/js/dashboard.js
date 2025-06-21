@@ -87,18 +87,27 @@ async function cargarDatosIniciales() {
 }
 
 // ===============================================
-// GESTIÓN DE MÉTODOS DE PAGO
+// GESTIÓN DE MÉTODOS DE PAGO - VERSIÓN SIMPLE
 // ===============================================
 async function cargarMetodosPago() {
     try {
         console.log('🔄 Cargando métodos de pago...');
 
-        const rutas = ['/api-metodos.php', '/api-metodos'];
+        const rutas = [
+            '/api/metodos-pago',            // Nueva ruta principal
+            '/api/metodos_pago',            // Ruta alternativa con underscore
+            '/backend/api/metodos_pago.php', // Ruta de respaldo directa
+            '/api-metodos',                 // Compatibilidad hacia atrás
+            '/api-metodos.php'              // Compatibilidad hacia atrás
+        ];
+
         let metodosObtenidos = false;
 
         for (const ruta of rutas) {
             try {
+                console.log(`🔍 Intentando: ${ruta}`);
                 const response = await fetch(ruta);
+
                 if (response.ok) {
                     const data = await response.text();
                     metodos = JSON.parse(data);
@@ -119,7 +128,8 @@ async function cargarMetodosPago() {
             metodos = [
                 { id: 1, nombre: 'Tarjeta de Crédito' },
                 { id: 2, nombre: 'PayPal' },
-                { id: 3, nombre: 'Transferencia Bancaria' }
+                { id: 3, nombre: 'Transferencia Bancaria' },
+                { id: 4, nombre: 'OXXO / Efectivo' }
             ];
             mostrarMensaje('Usando métodos de pago por defecto', 'warning');
         }
