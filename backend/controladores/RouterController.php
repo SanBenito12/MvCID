@@ -126,6 +126,11 @@ class RouterController
                 $this->serveFrontendPage('dashboard.php');
                 return true;
 
+            case '/carrito':
+            case '/carrito.php':
+                $this->serveFrontendPage('carrito.php');
+                return true;
+
             case '/logout':
             case '/logout.php':
                 $this->serveFrontendPage('logout.php');
@@ -257,6 +262,12 @@ class RouterController
                 return true;
             }
 
+            // Rutas de carrito - NUEVA FUNCIONALIDAD
+            if (preg_match('#^/api/carrito/?$#', $this->uri)) {
+                require_once $this->projectRoot . '/backend/api/carrito.php';
+                return true;
+            }
+
             // Ruta de autenticación
             if (preg_match('#^/api/auth/?$#', $this->uri)) {
                 require_once $this->projectRoot . '/backend/api/auth.php';
@@ -284,7 +295,8 @@ class RouterController
 
         // Rutas permitidas del backend
         $allowedBackendRoutes = [
-            '/backend/api/metodos_pago.php' => '/backend/api/metodos_pago.php'
+            '/backend/api/metodos_pago.php' => '/backend/api/metodos_pago.php',
+            '/backend/api/carrito.php' => '/backend/api/carrito.php'
         ];
 
         if (isset($allowedBackendRoutes[$this->uri])) {
@@ -315,6 +327,7 @@ class RouterController
                 "GET|POST|PATCH|DELETE /api/cursos",
                 "GET|POST /api/compras",
                 "GET|POST|PATCH|DELETE /api/metodos-pago",
+                "GET|POST|DELETE|PATCH /api/carrito",
                 "GET /api/auth"
             ]
         ]);
@@ -464,6 +477,7 @@ class RouterController
                 <a href="/login">🔑 Login</a>
                 <a href="/registro">👤 Registro</a>
                 <a href="/dashboard">📊 Dashboard</a>
+                <a href="/carrito">🛒 Carrito</a>
             </div>
 
             <div class="debug">

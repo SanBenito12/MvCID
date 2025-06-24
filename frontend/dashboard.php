@@ -16,7 +16,72 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
     <script>
         const id_cliente = "<?= $_SESSION['id_cliente'] ?>";
         const llave_secreta = "<?= $_SESSION['llave_secreta'] ?>";
+        const SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2cGtla3NidWpmZHN6Y2twdWtpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTUxMDQ1NCwiZXhwIjoyMDY1MDg2NDU0fQ.rNXqhDiKveKgUdFnStIVer7QkpGNsSPwM_f9FheQKhQ";
     </script>
+    <style>
+        /* Estilos adicionales para el botón del carrito */
+        .carrito-btn {
+            position: relative;
+            margin-right: var(--spacing-md);
+            text-decoration: none;
+            color: var(--text-primary);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: 2px solid var(--accent-blue);
+            border-radius: var(--radius-lg);
+            background: rgba(0, 212, 255, 0.1);
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .carrito-btn:hover {
+            background: var(--accent-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .carrito-contador {
+            background: var(--accent-red);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        .carrito-contador.show {
+            display: block;
+        }
+
+        .btn-carrito {
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 0.9rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .btn-carrito:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+    </style>
 </head>
 <body>
 <!-- Header -->
@@ -28,6 +93,14 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
         </h1>
         <div class="user-info">
             <span class="welcome-text">Bienvenido, <?= htmlspecialchars($_SESSION['nombre']) ?></span>
+
+            <!-- Botón del Carrito -->
+            <a href="/carrito" class="carrito-btn">
+                <i class="fas fa-shopping-cart"></i>
+                Mi Carrito
+                <span id="carrito-contador" class="carrito-contador">0</span>
+            </a>
+
             <a href="/logout" class="logout-btn">
                 <i class="fas fa-sign-out-alt"></i>
                 Cerrar Sesión
@@ -109,7 +182,7 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
                     <div class="form-group">
                         <label>
                             <i class="fas fa-dollar-sign"></i>
-                            Precio (USD)
+                            Precio
                         </label>
                         <input type="number" name="precio" placeholder="99.99" step="0.01" required>
                     </div>

@@ -1206,6 +1206,127 @@ window.cerrarModalEdicion = cerrarModalEdicion;
 window.cerrarModalConfirmacion = cerrarModalConfirmacion;
 
 // ===============================================
-// INICIALIZACIÓN FINAL
+// FUNCIONES ADICIONALES PARA EL CARRITO EN DASHBOARD
+// (Agregar al final de tu dashboard.js existente)
 // ===============================================
-console.log('✅ Dashboard JavaScript simplificado inicializado correctamente');
+
+// Función para actualizar contador del carrito
+async function actualizarContadorCarrito() {
+    try {
+        const url = `/api/carrito?accion=resumen&id_cliente=${encodeURIComponent(id_cliente)}&llave_secreta=${encodeURIComponent(llave_secreta)}`;
+        const response = await fetch(url);
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                const contador = document.getElementById('carrito-contador');
+                const cantidad = data.resumen.cantidad_items;
+
+                if (contador) {
+                    contador.textContent = cantidad;
+                    if (cantidad > 0) {
+                        contador.classList.add('show');
+                    } else {
+                        contador.classList.remove('show');
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Error actualizando contador carrito:', error);
+    }
+}
+
+// Función simple para agregar al carrito
+async function agregarAlCarrito(idCurso) {
+    try {
+        mostrarLoading(true);
+
+        const response = await fetch('/api/carrito', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                accion: 'agregar',
+                id_curso: idCurso,
+                id_cliente: id_cliente,
+                llave_secreta: llave_secreta
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            mostrarMensaje('✅ Curso agregado al carrito', 'success');
+            await actualizarContadorCarrito();
+
+            // Animar el botón del carrito
+            const carritoBtn = document.querySelector('.carrito-btn');
+            if (carritoBtn) {
+                carritoBtn.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    carritoBtn.style.transform = 'scale(1)';
+                }, 200);
+            }
+
+            // Preguntar si quiere ver el carrito
+            setTimeout(() => {
+                if (confirm('✅ Curso agregado al carrito.\n\n¿Quieres ver tu carrito ahora?')) {
+                    window.location.href = '/carrito';
+                }
+            }, 1000);
+
+        } else {
+            mostrarMensaje('⚠️ ' + data.error, 'warning');
+        }
+    } catch (error) {
+        console.error('❌ Error agregando al carrito:', error);
+        mostrarMensaje('Error al agregar curso al carrito', 'error');
+    } finally {
+        mostrarLoading(false);
+    }
+}
+
+// Modificar la función crearAccionesDisponibles existente
+// Busca esta función en tu dashboard.js y reemplázala con esta versión:
+function crearAccionesDisponibles(curso) {
+    const div = document.createElement('div');
+    div.className = 'curso-compra';
+
+    // Solo botón agregar al carrito (simple)
+    const btnCarrito = document.createElement('button');
+    btnCarrito.className = 'btn btn-primary';
+    btnCarrito.style.width = '100%';
+    btnCarrito.style.marginBottom = 'var(--spacing-md)';
+    btnCarrito.innerHTML = '<i class="fas fa-cart-plus"></i> Agregar al Carrito';
+    btnCarrito.onclick = () => agregarAlCarrito(curso.id);
+
+    // Información del precio
+    const precioDiv = document.createElement('div');
+    precioDiv.style.textAlign = 'center';
+    precioDiv.style.fontSize = '1.2rem';
+    precioDiv.style.fontWeight = 'bold';
+    precioDiv.style.color = 'var(--accent-green)';
+    precioDiv.style.marginTop = 'var(--spacing-md)';
+    precioDiv.innerHTML = `$${formatearPrecio(curso.precio)}`;
+
+    div.appendChild(btnCarrito);
+    div.appendChild(precioDiv);
+
+    return div;
+}
+
+// Actualizar contador al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    // Actualizar contador inmediatamente
+    setTimeout(actualizarContadorCarrito, 1000);
+
+    // Actualizar cada 30 segundos
+    setInterval(actualizarContadorCarrito, 30000);
+});
+
+// Exponer funciones globalmente
+window.agregarAlCarrito = agregarAlCarrito;
+window.actualizarContadorCarrito = actualizarContadorCarrito;
+
