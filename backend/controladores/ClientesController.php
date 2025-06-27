@@ -1,16 +1,16 @@
 <?php
-// backend/controladores/ClientesController.php
+// backend/controladores/ClientesController.php - Actualizado
 require_once __DIR__ . '/../modelos/Cliente.php';
 
 class ClientesController
 {
     /**
-     * Registrar un nuevo cliente
+     * Registrar un nuevo cliente con contraseña
      */
-    public function registrar($nombre, $apellido, $email)
+    public function registrar($nombre, $apellido, $email, $password)
     {
-        // Validaciones
-        if (empty($nombre) || empty($apellido) || empty($email)) {
+        // Validaciones básicas
+        if (empty($nombre) || empty($apellido) || empty($email) || empty($password)) {
             return [
                 "success" => false,
                 "error" => "Todos los campos son requeridos"
@@ -24,6 +24,15 @@ class ClientesController
             ];
         }
 
+        // Validar fortaleza de contraseña
+        $validacionPassword = Cliente::validarPassword($password);
+        if (!$validacionPassword["valida"]) {
+            return [
+                "success" => false,
+                "error" => "Contraseña no válida: " . implode(", ", $validacionPassword["errores"])
+            ];
+        }
+
         // Verificar si el email ya existe
         if (Cliente::emailExiste($email)) {
             return [
@@ -33,13 +42,50 @@ class ClientesController
         }
 
         // Crear cliente usando el modelo
-        return Cliente::crear($nombre, $apellido, $email);
+        return Cliente::crear($nombre, $apellido, $email, $password);
     }
 
     /**
-     * Login por email
+     * Login con email y contraseña
      */
-    public function login($email)
+    public function login($email, $password)
+    {
+        // Validaciones básicas
+        if (empty($email) || empty($password)) {
+            return [
+                "success" => false,
+                "error" => "Email y contraseña son requeridos"
+            ];
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return [
+                "success" => false,
+                "error" => "Email inválido"
+            ];
+        }
+
+        // Autenticar usando el modelo
+        $resultado = Cliente::autenticar($email, $password);
+
+        if ($resultado["success"]) {
+            $cliente = $resultado["cliente"];
+            return [
+                "success" => true,
+                "mensaje" => "Cliente autenticado",
+                "id_cliente" => $cliente["id_cliente"],
+                "llave_secreta" => $cliente["llave_secreta"],
+                "cliente" => $cliente
+            ];
+        } else {
+            return $resultado;
+        }
+    }
+
+    /**
+     * Login solo por email (método legacy para compatibilidad)
+     */
+    public function loginSoloEmail($email)
     {
         // Validaciones
         if (empty($email)) {
@@ -63,14 +109,52 @@ class ClientesController
             $cliente = $resultado["cliente"];
             return [
                 "success" => true,
-                "mensaje" => "Cliente autenticado",
+                "mensaje" => "Cliente encontrado (método legacy)",
                 "id_cliente" => $cliente["id_cliente"],
                 "llave_secreta" => $cliente["llave_secreta"],
                 "cliente" => $cliente
             ];
         } else {
-            return $resultado;
+            return [
+                "success" => false,
+                "error" => "Usuario no encontrado"
+            ];
         }
+    }
+
+    /**
+     * Cambiar contraseña
+     */
+    public function cambiarPassword($id_cliente, $llave_secreta, $password_actual, $password_nueva)
+    {
+        // Validar credenciales
+        $validacion = Cliente::validarCredenciales($id_cliente, $llave_secreta);
+
+        if (!$validacion["success"]) {
+            return [
+                "success" => false,
+                "error" => "Credenciales inválidas"
+            ];
+        }
+
+        // Validaciones de contraseña
+        if (empty($password_actual) || empty($password_nueva)) {
+            return [
+                "success" => false,
+                "error" => "Contraseña actual y nueva son requeridas"
+            ];
+        }
+
+        // Validar fortaleza de nueva contraseña
+        $validacionPassword = Cliente::validarPassword($password_nueva);
+        if (!$validacionPassword["valida"]) {
+            return [
+                "success" => false,
+                "error" => "Nueva contraseña no válida: " . implode(", ", $validacionPassword["errores"])
+            ];
+        }
+
+        return Cliente::cambiarPassword($id_cliente, $password_actual, $password_nueva);
     }
 
     /**
@@ -171,7 +255,7 @@ class ClientesController
     }
 
     /**
-     * Cambiar credenciales de un cliente
+     * Regenerar credenciales de un cliente
      */
     public function regenerarCredenciales($id)
     {
@@ -182,7 +266,7 @@ class ClientesController
             ];
         }
 
-        // Generar nuevas credenciales
+        // Generar nuevas credenciales ENCRIPTADO
         $nuevasCredenciales = [
             "id_cliente" => bin2hex(random_bytes(32)),
             "llave_secreta" => bin2hex(random_bytes(32))
@@ -247,5 +331,13 @@ class ClientesController
                 "ingresos" => $ingresos["success"] ? $ingresos["ingresos"] : null
             ]
         ];
+    }
+
+    /**
+     * Validar fortaleza de contraseña ValidarContra
+     */
+    public function validarFortalezaPassword($password)
+    {
+        return Cliente::validarPassword($password);
     }
 }

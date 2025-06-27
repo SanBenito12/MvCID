@@ -131,6 +131,26 @@ class RouterController
                 $this->serveFrontendPage('carrito.php');
                 return true;
 
+            case '/cambiar-password':
+            case '/cambiar-password.php':
+            case '/change-password':
+            case '/password':
+                $this->serveFrontendPage('cambiar-password.php');
+                return true;
+
+            case '/perfil':
+            case '/perfil.php':
+            case '/profile':
+                $this->serveFrontendPage('perfil.php');
+                return true;
+
+            case '/configuracion':
+            case '/configuracion.php':
+            case '/config':
+            case '/settings':
+                $this->serveFrontendPage('configuracion.php');
+                return true;
+
             case '/logout':
             case '/logout.php':
                 $this->serveFrontendPage('logout.php');
@@ -147,10 +167,26 @@ class RouterController
                 $this->serveDebugPage('test-metodos.php');
                 return true;
 
+            case '/test-password':
+            case '/test-password.php':
+                $this->serveDebugPage('test-password.php');
+                return true;
+
             // Compatibilidad hacia atrás para api-metodos
             case '/api-metodos':
             case '/api-metodos.php':
                 require_once $this->projectRoot . '/backend/api/metodos_pago.php';
+                return true;
+
+            // Rutas de ayuda y documentación
+            case '/help':
+            case '/ayuda':
+                $this->serveFrontendPage('ayuda.php');
+                return true;
+
+            case '/about':
+            case '/acerca':
+                $this->serveFrontendPage('acerca.php');
                 return true;
         }
 
@@ -182,8 +218,90 @@ class RouterController
             require_once $filePath;
         } else {
             error_log("Frontend page not found: $filePath");
-            $this->handle404();
+            
+            // Si es una página que requiere autenticación, crear una página genérica
+            if (in_array($page, ['cambiar-password.php', 'perfil.php', 'configuracion.php'])) {
+                $this->createGenericAuthPage($page);
+            } else {
+                $this->handle404();
+            }
         }
+    }
+
+    /**
+     * Crear página genérica para páginas que requieren autenticación
+     */
+    private function createGenericAuthPage($page)
+    {
+        session_start();
+        if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
+            header("Location: /login");
+            exit;
+        }
+
+        $pageTitle = '';
+        $pageIcon = '';
+        $pageDescription = '';
+
+        switch ($page) {
+            case 'cambiar-password.php':
+                $pageTitle = 'Cambiar Contraseña';
+                $pageIcon = 'fas fa-key';
+                $pageDescription = 'Esta página está en construcción. Puedes cambiar tu contraseña desde el dashboard.';
+                break;
+            case 'perfil.php':
+                $pageTitle = 'Mi Perfil';
+                $pageIcon = 'fas fa-user';
+                $pageDescription = 'Esta página está en construcción. Tu información de perfil se muestra en el dashboard.';
+                break;
+            case 'configuracion.php':
+                $pageTitle = 'Configuración';
+                $pageIcon = 'fas fa-cog';
+                $pageDescription = 'Esta página está en construcción. Las opciones de configuración están disponibles en el dashboard.';
+                break;
+        }
+
+        ?>
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title><?= $pageTitle ?> - MVC SISTEMA</title>
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+            <link href="/assets/css/dashboard.css" rel="stylesheet">
+        </head>
+        <body>
+        <div class="container">
+            <div class="header">
+                <h1>
+                    <i class="<?= $pageIcon ?>"></i>
+                    <?= $pageTitle ?>
+                </h1>
+                <div class="user-info">
+                    <a href="/dashboard" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver al Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-bg" style="padding: var(--spacing-2xl); text-align: center; border-radius: var(--radius-xl); border: 1px solid var(--border-color);">
+                <i class="<?= $pageIcon ?>" style="font-size: 4rem; color: var(--accent-blue); margin-bottom: var(--spacing-lg);"></i>
+                <h2 style="color: var(--text-primary); margin-bottom: var(--spacing-md);"><?= $pageTitle ?></h2>
+                <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6;"><?= $pageDescription ?></p>
+                
+                <div style="margin-top: var(--spacing-2xl);">
+                    <a href="/dashboard" class="btn btn-primary">
+                        <i class="fas fa-home"></i>
+                        Ir al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+        </body>
+        </html>
+        <?php
     }
 
     /**
@@ -230,8 +348,20 @@ class RouterController
                 return true;
             }
 
+            if ($this->uri === '/api/clientes/login-legacy' && $this->method === 'POST') {
+                $_GET['accion'] = 'login-legacy';
+                require_once $this->projectRoot . '/backend/api/clientes.php';
+                return true;
+            }
+
             if ($this->uri === '/api/clientes/registro' && $this->method === 'POST') {
                 $_GET['accion'] = 'registro';
+                require_once $this->projectRoot . '/backend/api/clientes.php';
+                return true;
+            }
+
+            if ($this->uri === '/api/clientes/cambiar-password' && $this->method === 'POST') {
+                $_GET['accion'] = 'cambiar-password';
                 require_once $this->projectRoot . '/backend/api/clientes.php';
                 return true;
             }
@@ -274,6 +404,20 @@ class RouterController
                 return true;
             }
 
+            // Rutas de utilidades
+            if ($this->uri === '/api/test-connection' && $this->method === 'GET') {
+                echo json_encode([
+                    "success" => true,
+                    "message" => "Conexión API funcionando correctamente",
+                    "timestamp" => date('Y-m-d H:i:s'),
+                    "server_info" => [
+                        "php_version" => PHP_VERSION,
+                        "server_software" => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown'
+                    ]
+                ]);
+                return true;
+            }
+
             // API no encontrada
             $this->handleApiNotFound();
             return true;
@@ -296,7 +440,8 @@ class RouterController
         // Rutas permitidas del backend
         $allowedBackendRoutes = [
             '/backend/api/metodos_pago.php' => '/backend/api/metodos_pago.php',
-            '/backend/api/carrito.php' => '/backend/api/carrito.php'
+            '/backend/api/carrito.php' => '/backend/api/carrito.php',
+            '/backend/api/clientes.php' => '/backend/api/clientes.php'
         ];
 
         if (isset($allowedBackendRoutes[$this->uri])) {
@@ -322,13 +467,16 @@ class RouterController
             "method" => $this->method,
             "available_routes" => [
                 "POST /api/clientes/login",
+                "POST /api/clientes/login-legacy",
                 "POST /api/clientes/registro",
+                "POST /api/clientes/cambiar-password",
                 "GET /api/clientes",
                 "GET|POST|PATCH|DELETE /api/cursos",
                 "GET|POST /api/compras",
                 "GET|POST|PATCH|DELETE /api/metodos-pago",
                 "GET|POST|DELETE|PATCH /api/carrito",
-                "GET /api/auth"
+                "GET /api/auth",
+                "GET /api/test-connection"
             ]
         ]);
     }
@@ -342,7 +490,8 @@ class RouterController
         http_response_code(500);
         echo json_encode([
             "error" => "Error interno del servidor",
-            "message" => $exception->getMessage()
+            "message" => $exception->getMessage(),
+            "timestamp" => date('Y-m-d H:i:s')
         ]);
     }
 
@@ -502,6 +651,39 @@ class RouterController
             'method' => $this->method,
             'project_root' => $this->projectRoot,
             'timestamp' => date('Y-m-d H:i:s')
+        ];
+    }
+
+    /**
+     * Listar todas las rutas disponibles
+     */
+    public function listRoutes()
+    {
+        return [
+            'frontend_routes' => [
+                '/' => 'Redirige a login o dashboard',
+                '/login' => 'Página de inicio de sesión',
+                '/registro' => 'Página de registro',
+                '/dashboard' => 'Dashboard principal',
+                '/carrito' => 'Carrito de compras',
+                '/cambiar-password' => 'Cambiar contraseña',
+                '/perfil' => 'Perfil de usuario',
+                '/configuracion' => 'Configuración',
+                '/logout' => 'Cerrar sesión'
+            ],
+            'api_routes' => [
+                'POST /api/clientes/login' => 'Login con contraseña',
+                'POST /api/clientes/login-legacy' => 'Login solo con email',
+                'POST /api/clientes/registro' => 'Registro de usuario',
+                'POST /api/clientes/cambiar-password' => 'Cambiar contraseña',
+                'GET /api/clientes' => 'Listar clientes',
+                'GET|POST|PATCH|DELETE /api/cursos' => 'Gestión de cursos',
+                'GET|POST /api/compras' => 'Gestión de compras',
+                'GET /api/metodos-pago' => 'Métodos de pago',
+                'GET|POST|DELETE|PATCH /api/carrito' => 'Gestión del carrito',
+                'GET /api/auth' => 'Validación de autenticación',
+                'GET /api/test-connection' => 'Prueba de conexión'
+            ]
         ];
     }
 }

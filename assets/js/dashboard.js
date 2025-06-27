@@ -87,6 +87,383 @@ async function cargarDatosIniciales() {
 }
 
 // ===============================================
+// DROPDOWN FUNCTIONALITY CORREGIDO - AGREGAR AL FINAL DE dashboard.js
+// ===============================================
+
+// Función principal para toggle del dropdown - MEJORADA
+window.toggleDropdown = function() {
+    console.log('🔽 Toggle dropdown called');
+    
+    const dropdown = document.getElementById('dropdown-menu');
+    const dropdownContainer = document.querySelector('.dropdown');
+    const configBtn = document.querySelector('.config-btn');
+    
+    if (!dropdown) {
+        console.error('❌ Dropdown menu element not found');
+        return;
+    }
+    
+    if (!dropdownContainer) {
+        console.error('❌ Dropdown container not found');
+        return;
+    }
+    
+    const isOpen = dropdown.classList.contains('show');
+    
+    console.log('📊 Estado actual:', {
+        isOpen: isOpen,
+        dropdown: !!dropdown,
+        container: !!dropdownContainer,
+        display: window.getComputedStyle(dropdown).display,
+        opacity: window.getComputedStyle(dropdown).opacity,
+        zIndex: window.getComputedStyle(dropdown).zIndex
+    });
+    
+    if (isOpen) {
+        // Cerrar dropdown
+        dropdown.classList.remove('show');
+        dropdownContainer.classList.remove('active');
+        dropdown.style.pointerEvents = 'none';
+        console.log('📤 Dropdown cerrado');
+    } else {
+        // Cerrar otros dropdowns primero
+        closeAllDropdowns();
+        
+        // Abrir dropdown con timeout para asegurar renderizado
+        setTimeout(() => {
+            dropdown.classList.add('show');
+            dropdownContainer.classList.add('active');
+            dropdown.style.pointerEvents = 'auto';
+            
+            // Force reflow para asegurar que se renderice
+            dropdown.offsetHeight;
+            
+            console.log('📥 Dropdown abierto');
+            
+            // Debug: verificar estilos después de abrir
+            const computedStyle = window.getComputedStyle(dropdown);
+            console.log('🔍 Estilos después de abrir:', {
+                display: computedStyle.display,
+                opacity: computedStyle.opacity,
+                visibility: computedStyle.visibility,
+                transform: computedStyle.transform,
+                zIndex: computedStyle.zIndex,
+                position: computedStyle.position
+            });
+        }, 10);
+    }
+};
+
+// Función para cerrar dropdown
+window.closeDropdown = function() {
+    const dropdown = document.getElementById('dropdown-menu');
+    const dropdownContainer = document.querySelector('.dropdown');
+    
+    if (dropdown && dropdownContainer) {
+        dropdown.classList.remove('show');
+        dropdownContainer.classList.remove('active');
+        dropdown.style.pointerEvents = 'none';
+        console.log('🔒 Dropdown cerrado programáticamente');
+    }
+};
+
+// Función para cerrar todos los dropdowns
+function closeAllDropdowns() {
+    const allDropdowns = document.querySelectorAll('.dropdown-menu');
+    const allContainers = document.querySelectorAll('.dropdown');
+    
+    allDropdowns.forEach(dropdown => {
+        dropdown.classList.remove('show');
+        dropdown.style.pointerEvents = 'none';
+    });
+    
+    allContainers.forEach(container => {
+        container.classList.remove('active');
+    });
+}
+
+// Event listener para clicks fuera del dropdown - MEJORADO
+document.addEventListener('click', function(event) {
+    const dropdownContainer = document.querySelector('.dropdown');
+    const dropdown = document.getElementById('dropdown-menu');
+    
+    // Verificar si el click fue dentro del dropdown o su contenedor
+    if (dropdownContainer && !dropdownContainer.contains(event.target)) {
+        console.log('👆 Click fuera del dropdown, cerrando...');
+        closeDropdown();
+    } else if (dropdownContainer && dropdownContainer.contains(event.target)) {
+        console.log('👆 Click dentro del dropdown');
+        
+        // Si es un link, cerrar después de un delay
+        if (event.target.tagName === 'A' || event.target.closest('a')) {
+            setTimeout(() => {
+                closeDropdown();
+            }, 150);
+        }
+    }
+});
+
+// Event listener para tecla ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        console.log('⌨️ ESC presionado, cerrando dropdown');
+        closeDropdown();
+    }
+});
+
+// Inicialización mejorada del dropdown
+function initDropdown() {
+    console.log('🚀 Inicializando dropdown functionality...');
+    
+    const dropdown = document.getElementById('dropdown-menu');
+    const configBtn = document.querySelector('.config-btn');
+    const dropdownContainer = document.querySelector('.dropdown');
+    
+    // Verificar elementos
+    console.log('🔍 Elementos encontrados:', {
+        dropdown: !!dropdown,
+        configBtn: !!configBtn,
+        container: !!dropdownContainer
+    });
+    
+    if (!dropdown) {
+        console.error('❌ Elemento dropdown-menu no encontrado');
+        return false;
+    }
+    
+    if (!configBtn) {
+        console.error('❌ Botón config-btn no encontrado');
+        return false;
+    }
+    
+    // Configurar estilos iniciales forzados
+    dropdown.style.position = 'absolute';
+    dropdown.style.zIndex = '9999';
+    dropdown.style.pointerEvents = 'none';
+    
+    // Event listeners para los items del dropdown
+    const dropdownItems = dropdown.querySelectorAll('.dropdown-item');
+    
+    dropdownItems.forEach((item, index) => {
+        console.log(`📋 Configurando item ${index + 1}: ${item.textContent.trim()}`);
+        
+        // Limpiar event listeners existentes
+        item.removeEventListener('click', handleDropdownItemClick);
+        item.addEventListener('click', handleDropdownItemClick);
+        
+        // Agregar efectos de hover
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(6px)';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0)';
+        });
+    });
+    
+    // Prevenir que clicks dentro del dropdown lo cierren
+    dropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+        console.log('👆 Click dentro del dropdown menu');
+    });
+    
+    // Configurar botón principal
+    configBtn.removeEventListener('click', toggleDropdown);
+    configBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleDropdown();
+    });
+    
+    // Soporte para teclado
+    configBtn.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleDropdown();
+        }
+    });
+    
+    console.log('✅ Dropdown functionality initialized');
+    console.log('📊 Items encontrados:', dropdownItems.length);
+    
+    return true;
+}
+
+// Handler para clicks en items del dropdown
+function handleDropdownItemClick(e) {
+    console.log(`🔗 Click en: ${this.textContent.trim()}`);
+    
+    // Si es un enlace válido, cerrar dropdown después de un delay
+    if (this.href && !this.href.includes('javascript:')) {
+        setTimeout(() => {
+            closeDropdown();
+        }, 100);
+    } else if (this.onclick) {
+        // Si tiene onclick, ejecutar y cerrar
+        setTimeout(() => {
+            closeDropdown();
+        }, 100);
+    }
+}
+
+// Función de debug mejorada
+window.debugDropdown = function() {
+    const dropdown = document.getElementById('dropdown-menu');
+    const container = document.querySelector('.dropdown');
+    const items = document.querySelectorAll('.dropdown-item');
+    const configBtn = document.querySelector('.config-btn');
+    
+    console.log('🔍 DROPDOWN DEBUG AVANZADO:');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
+    // Elementos
+    console.log('📦 ELEMENTOS:');
+    console.log('  - Dropdown exists:', !!dropdown);
+    console.log('  - Container exists:', !!container);
+    console.log('  - Config button exists:', !!configBtn);
+    console.log('  - Items count:', items.length);
+    
+    // Estados
+    if (dropdown) {
+        const isOpen = dropdown.classList.contains('show');
+        console.log('📊 ESTADOS:');
+        console.log('  - Is open:', isOpen);
+        console.log('  - Container active:', container ? container.classList.contains('active') : false);
+        console.log('  - Classes:', dropdown.className);
+        
+        // Estilos computados
+        const styles = window.getComputedStyle(dropdown);
+        console.log('🎨 ESTILOS COMPUTADOS:');
+        console.log('  - Display:', styles.display);
+        console.log('  - Opacity:', styles.opacity);
+        console.log('  - Visibility:', styles.visibility);
+        console.log('  - Transform:', styles.transform);
+        console.log('  - Z-Index:', styles.zIndex);
+        console.log('  - Position:', styles.position);
+        console.log('  - Top:', styles.top);
+        console.log('  - Right:', styles.right);
+        console.log('  - Width:', styles.width);
+        console.log('  - Height:', styles.height);
+        
+        // Posición en viewport
+        const rect = dropdown.getBoundingClientRect();
+        console.log('📍 POSICIÓN EN VIEWPORT:');
+        console.log('  - Top:', rect.top);
+        console.log('  - Right:', rect.right);
+        console.log('  - Bottom:', rect.bottom);
+        console.log('  - Left:', rect.left);
+        console.log('  - Width:', rect.width);
+        console.log('  - Height:', rect.height);
+        console.log('  - Visible:', rect.width > 0 && rect.height > 0);
+    }
+    
+    // Items
+    console.log('📋 ITEMS:');
+    items.forEach((item, i) => {
+        console.log(`  ${i + 1}. ${item.textContent.trim()}`);
+        console.log(`     - Href: ${item.href || 'N/A'}`);
+        console.log(`     - Visible: ${item.offsetWidth > 0 && item.offsetHeight > 0}`);
+    });
+    
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+};
+
+// Función para forzar visibilidad (para debugging)
+window.forceDropdownVisible = function() {
+    const dropdown = document.getElementById('dropdown-menu');
+    if (dropdown) {
+        dropdown.classList.add('force-visible');
+        console.log('🔧 Dropdown forzado a visible');
+    }
+};
+
+// Función para remover forzado
+window.removeForceVisible = function() {
+    const dropdown = document.getElementById('dropdown-menu');
+    if (dropdown) {
+        dropdown.classList.remove('force-visible');
+        console.log('🔧 Forzado removido');
+    }
+};
+
+// Función para re-inicializar si es necesario
+window.reinitDropdown = function() {
+    console.log('🔄 Re-inicializando dropdown...');
+    
+    // Limpiar estado
+    closeAllDropdowns();
+    
+    // Re-inicializar
+    setTimeout(() => {
+        initDropdown();
+        console.log('✅ Dropdown re-inicializado');
+    }, 100);
+};
+
+// Event listener principal para inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎯 DOM loaded, inicializando dropdown...');
+    
+    // Esperar un poco para asegurar que todos los estilos estén cargados
+    setTimeout(() => {
+        const success = initDropdown();
+        
+        if (success) {
+            console.log('✅ Dropdown inicializado correctamente');
+            
+            // Auto-debug en desarrollo
+            if (window.location.hostname === 'localhost') {
+                setTimeout(() => {
+                    console.log('🔧 Auto-debug dropdown (desarrollo):');
+                    debugDropdown();
+                }, 1000);
+            }
+        } else {
+            console.error('❌ Error al inicializar dropdown');
+        }
+    }, 500);
+});
+
+// Observer para detectar cambios en el DOM que puedan afectar el dropdown
+if (window.MutationObserver) {
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList') {
+                const addedNodes = Array.from(mutation.addedNodes);
+                const removedNodes = Array.from(mutation.removedNodes);
+                
+                // Si se agregó o removió el dropdown, re-inicializar
+                const affectsDropdown = [...addedNodes, ...removedNodes].some(node => {
+                    return node.nodeType === Node.ELEMENT_NODE && 
+                           (node.classList?.contains('dropdown') || 
+                            node.querySelector?.('.dropdown'));
+                });
+                
+                if (affectsDropdown) {
+                    console.log('🔄 Cambio detectado en dropdown, re-inicializando...');
+                    setTimeout(reinitDropdown, 100);
+                }
+            }
+        });
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
+// Exponer funciones globalmente
+window.toggleDropdown = toggleDropdown;
+window.closeDropdown = closeDropdown;
+window.debugDropdown = debugDropdown;
+window.reinitDropdown = reinitDropdown;
+window.forceDropdownVisible = forceDropdownVisible;
+window.removeForceVisible = removeForceVisible;
+
+console.log('✅ Dropdown module loaded successfully with enhanced debugging');
+
+// ===============================================
 // GESTIÓN DE MÉTODOS DE PAGO - VERSIÓN SIMPLE
 // ===============================================
 async function cargarMetodosPago() {

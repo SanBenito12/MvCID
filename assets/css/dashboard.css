@@ -183,7 +183,460 @@ body {
     box-shadow: var(--shadow-lg);
     filter: brightness(1.1);
 }
+/* ===============================================
+   ESTILOS ADICIONALES PARA HEADER SIN DROPDOWN
+   =============================================== */
 
+/* Remover estilos de dropdown - SOBRESCRIBIR */
+.dropdown, .dropdown-menu, .dropdown-item, .config-btn {
+    display: none !important;
+}
+
+/* Nuevos estilos para el header mejorado */
+.user-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-md);
+}
+
+.welcome-text {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-right: var(--spacing-lg);
+    white-space: nowrap;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--secondary-bg);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 0.9rem;
+    font-weight: 500;
+    min-height: 40px;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+
+.action-btn:hover {
+    background: var(--accent-bg);
+    color: var(--accent-blue);
+    border-color: var(--accent-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+}
+
+.action-btn:focus {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+.action-btn.primary {
+    background: var(--gradient-accent);
+    color: white;
+    border-color: var(--accent-blue);
+}
+
+.action-btn.primary:hover {
+    background: var(--gradient-accent);
+    color: white;
+    filter: brightness(1.1);
+}
+
+.action-btn.danger {
+    background: var(--gradient-danger);
+    color: white;
+    border-color: var(--accent-red);
+}
+
+.action-btn.danger:hover {
+    background: var(--gradient-danger);
+    color: white;
+    filter: brightness(1.1);
+}
+
+/* Mejorar el botón del carrito */
+.carrito-btn {
+    position: relative;
+    text-decoration: none;
+    color: var(--text-primary);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--accent-blue);
+    border-radius: var(--radius-lg);
+    background: rgba(0, 212, 255, 0.1);
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-weight: 600;
+    min-height: 40px;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+}
+
+.carrito-btn:hover {
+    background: var(--accent-blue);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+}
+
+.carrito-btn:focus {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+.carrito-contador {
+    background: var(--accent-red);
+    color: white;
+    border-radius: 50%;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    display: none;
+    animation: pulse 2s infinite;
+    border: 2px solid var(--card-bg);
+}
+
+.carrito-contador.show {
+    display: block;
+}
+
+/* Responsive design mejorado */
+@media (max-width: 1200px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .action-buttons {
+        gap: var(--spacing-xs);
+    }
+    
+    .action-btn {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.85rem;
+    }
+    
+    .welcome-text {
+        font-size: 1rem;
+        margin-right: var(--spacing-md);
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        text-align: center;
+        padding: var(--spacing-lg);
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .header h1 i {
+        font-size: 2.5rem;
+    }
+
+    .user-section {
+        align-items: center;
+        width: 100%;
+        gap: var(--spacing-md);
+    }
+
+    .user-info {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        width: 100%;
+        align-items: center;
+    }
+
+    .welcome-text {
+        margin-right: 0;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    .action-buttons {
+        justify-content: center;
+        gap: var(--spacing-sm);
+        width: 100%;
+    }
+
+    .action-btn {
+        flex: 1;
+        justify-content: center;
+        min-width: 100px;
+        font-size: 0.85rem;
+        max-width: 140px;
+    }
+
+    .carrito-btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: var(--spacing-sm);
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: var(--spacing-md);
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .header h1 i {
+        font-size: 2rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: var(--spacing-sm);
+    }
+
+    .action-btn {
+        width: 100%;
+        justify-content: center;
+        min-width: auto;
+        max-width: none;
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .welcome-text {
+        font-size: 0.95rem;
+    }
+
+    .carrito-btn {
+        max-width: none;
+    }
+}
+
+/* Mejoras adicionales para accesibilidad */
+.action-btn:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+.carrito-btn:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+/* Animaciones suaves */
+.action-btn, .carrito-btn {
+    transition: all var(--transition-normal);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+.carrito-btn:active {
+    transform: translateY(0);
+}
+
+/* Estados disabled */
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Hover effects mejorados */
+.action-buttons .action-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.carrito-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Separadores visuales opcionales */
+.action-buttons::before {
+    content: '';
+    width: 1px;
+    height: 30px;
+    background: var(--border-color);
+    margin-right: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+    .action-buttons::before {
+        display: none;
+    }
+}
+
+/* Efectos especiales para botones */
+.action-btn i {
+    transition: transform var(--transition-normal);
+}
+
+.action-btn:hover i {
+    transform: scale(1.1);
+}
+
+.carrito-btn i {
+    transition: transform var(--transition-normal);
+}
+
+.carrito-btn:hover i {
+    transform: scale(1.1);
+}
+
+/* Tooltip effects para botones pequeños en mobile */
+@media (max-width: 480px) {
+    .action-btn[data-tooltip] {
+        position: relative;
+    }
+    
+    .action-btn[data-tooltip]:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary-bg);
+        color: var(--text-primary);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        white-space: nowrap;
+        z-index: 1000;
+        margin-bottom: var(--spacing-xs);
+        border: 1px solid var(--border-color);
+    }
+}
+
+/* Layout grid para action buttons en mobile */
+@media (max-width: 480px) {
+    .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-sm);
+        width: 100%;
+    }
+    
+    .action-btn:last-child {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Mejoras de contraste para mejor legibilidad */
+.action-btn {
+    border-width: 1.5px;
+}
+
+.action-btn:hover {
+    border-width: 1.5px;
+}
+
+.carrito-btn {
+    border-width: 2px;
+}
+
+/* Estados de focus mejorados para navegación por teclado */
+.action-btn:focus,
+.carrito-btn:focus {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+    z-index: 1;
+}
+
+/* Estilos para modo de alto contraste */
+@media (prefers-contrast: high) {
+    .action-btn {
+        border-width: 2px;
+        font-weight: 600;
+    }
+    
+    .action-btn:hover {
+        border-width: 2px;
+    }
+    
+    .carrito-btn {
+        border-width: 3px;
+        font-weight: 700;
+    }
+}
+
+/* Reducir animaciones para usuarios que las prefieren */
+@media (prefers-reduced-motion: reduce) {
+    .action-btn,
+    .carrito-btn,
+    .action-btn i,
+    .carrito-btn i {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .action-btn:hover,
+    .carrito-btn:hover {
+        transform: none !important;
+    }
+}
+
+/* Mejoras para pantallas grandes */
+@media (min-width: 1400px) {
+    .user-section {
+        gap: var(--spacing-lg);
+    }
+    
+    .action-buttons {
+        gap: var(--spacing-md);
+    }
+    
+    .action-btn {
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: 1rem;
+        min-height: 44px;
+    }
+    
+    .carrito-btn {
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: 1rem;
+        min-height: 44px;
+    }
+    
+    .welcome-text {
+        font-size: 1.2rem;
+    }
+}
 /* ===============================================
    ESTADÍSTICAS
    =============================================== */
@@ -1435,3 +1888,183 @@ textarea {
         text-align: center;
     }
 }
+
+
+
+/* ===============================================
+   CARRITO
+   =============================================== */
+/* Estilos adicionales para el botón del carrito */
+        .carrito-btn {
+            position: relative;
+            margin-right: var(--spacing-md);
+            text-decoration: none;
+            color: var(--text-primary);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: 2px solid var(--accent-blue);
+            border-radius: var(--radius-lg);
+            background: rgba(0, 212, 255, 0.1);
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .carrito-btn:hover {
+            background: var(--accent-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .carrito-contador {
+            background: var(--accent-red);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        .carrito-contador.show {
+            display: block;
+        }
+
+        .btn-carrito {
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 0.9rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .btn-carrito:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Dropdown de configuración */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .config-btn {
+            background: var(--gradient-primary);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-md);
+            font-weight: 600;
+        }
+
+        .config-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            filter: brightness(1.1);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            min-width: 220px;
+            z-index: 1000;
+            margin-top: var(--spacing-sm);
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            animation: slideInDown 0.3s ease;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all var(--transition-normal);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 500;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: var(--accent-bg);
+            color: var(--accent-blue);
+            transform: translateX(4px);
+        }
+
+        .dropdown-item.logout:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: var(--spacing-sm) 0;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive para dropdown */
+        @media (max-width: 768px) {
+            .user-info {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+                align-items: stretch;
+            }
+            
+            .dropdown-menu {
+                right: 0;
+                left: 0;
+                min-width: auto;
+            }
+            
+            .config-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }

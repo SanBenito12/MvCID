@@ -1,5 +1,5 @@
 <?php
-// backend/api/clientes.php - API actualizada con controladores separados
+// backend/api/clientes.php - API actualizada con contraseñas
 session_start();
 header('Content-Type: application/json');
 
@@ -20,8 +20,14 @@ try {
 
         if ($accion === 'login') {
             handleLogin($controller, $input);
+        } elseif ($accion === 'login-legacy') {
+            handleLoginLegacy($controller, $input);
         } elseif ($accion === 'registro') {
             handleRegister($controller, $input);
+        } elseif ($accion === 'cambiar-password') {
+            handleChangePassword($controller, $input);
+        } elseif ($accion === 'validar-password') {
+            handleValidatePassword($controller, $input);
         } else {
             http_response_code(400);
             echo json_encode([
@@ -49,16 +55,16 @@ try {
 }
 
 /**
- * Manejar login
+ * Manejar login con email y contraseña
  */
 function handleLogin($controller, $input) {
-    if (!$input || !isset($input['email'])) {
+    if (!$input || !isset($input['email']) || !isset($input['password'])) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Email es requerido']);
+        echo json_encode(['success' => false, 'message' => 'Email y contraseña son requeridos']);
         return;
     }
 
-    $resultado = $controller->login($input['email']);
+    $resultado = $controller->login($input['email'], $input['password']);
 
     if ($resultado['success']) {
         // Crear sesión
@@ -89,16 +95,62 @@ function handleLogin($controller, $input) {
 }
 
 /**
- * Manejar registro
+ * Manejar login legacy (solo email)
  */
-function handleRegister($controller, $input) {
-    if (!$input || !isset($input['email']) || !isset($input['nombre']) || !isset($input['apellido'])) {
+function handleLoginLegacy($controller, $input) {
+    if (!$input || !isset($input['email'])) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Todos los campos son requeridos']);
+        echo json_encode(['success' => false, 'message' => 'Email es requerido']);
         return;
     }
 
-    $resultado = $controller->registrar($input['nombre'], $input['apellido'], $input['email']);
+    $resultado = $controller->loginSoloEmail($input['email']);
+
+    if ($resultado['success']) {
+        // Crear sesión
+        $_SESSION['id_cliente'] = $resultado['id_cliente'];
+        $_SESSION['llave_secreta'] = $resultado['llave_secreta'];
+        $_SESSION['email'] = $resultado['cliente']['email'];
+        $_SESSION['nombre'] = $resultado['cliente']['nombre'];
+        $_SESSION['apellido'] = $resultado['cliente']['apellido'];
+
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Login exitoso (método legacy)',
+            'data' => [
+                'id' => $resultado['cliente']['id'],
+                'email' => $resultado['cliente']['email'],
+                'nombre' => $resultado['cliente']['nombre'],
+                'apellido' => $resultado['cliente']['apellido']
+            ]
+        ]);
+    } else {
+        http_response_code(401);
+        echo json_encode([
+            'success' => false,
+            'message' => $resultado['error']
+        ]);
+    }
+}
+
+/**
+ * Manejar registro con contraseña
+ */
+function handleRegister($controller, $input) {
+    if (!$input || !isset($input['email']) || !isset($input['nombre']) || 
+        !isset($input['apellido']) || !isset($input['password'])) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Todos los campos son requeridos (nombre, apellido, email, password)']);
+        return;
+    }
+
+    $resultado = $controller->registrar(
+        $input['nombre'], 
+        $input['apellido'], 
+        $input['email'], 
+        $input['password']
+    );
 
     if ($resultado['success']) {
         // Crear sesión automáticamente
@@ -127,6 +179,50 @@ function handleRegister($controller, $input) {
             'message' => $resultado['error']
         ]);
     }
+}
+
+/**
+ * Manejar cambio de contraseña
+ */
+function handleChangePassword($controller, $input) {
+    $id_cliente = $_GET['id_cliente'] ?? $input['id_cliente'] ?? null;
+    $llave_secreta = $_GET['llave_secreta'] ?? $input['llave_secreta'] ?? null;
+    $password_actual = $input['password_actual'] ?? null;
+    $password_nueva = $input['password_nueva'] ?? null;
+
+    if (!$id_cliente || !$llave_secreta || !$password_actual || !$password_nueva) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Todos los campos son requeridos']);
+        return;
+    }
+
+    $resultado = $controller->cambiarPassword($id_cliente, $llave_secreta, $password_actual, $password_nueva);
+
+    if ($resultado['success']) {
+        echo json_encode($resultado);
+    } else {
+        $statusCode = (strpos($resultado['error'], 'Credenciales') !== false) ? 401 : 400;
+        http_response_code($statusCode);
+        echo json_encode($resultado);
+    }
+}
+
+/**
+ * Manejar validación de fortaleza de contraseña
+ */
+function handleValidatePassword($controller, $input) {
+    if (!$input || !isset($input['password'])) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Contraseña requerida']);
+        return;
+    }
+
+    $resultado = $controller->validarFortalezaPassword($input['password']);
+    echo json_encode([
+        'success' => true,
+        'valida' => $resultado['valida'],
+        'errores' => $resultado['errores']
+    ]);
 }
 
 /**
