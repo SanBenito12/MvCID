@@ -19,13 +19,83 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
         const SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2cGtla3NidWpmZHN6Y2twdWtpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTUxMDQ1NCwiZXhwIjoyMDY1MDg2NDU0fQ.rNXqhDiKveKgUdFnStIVer7QkpGNsSPwM_f9FheQKhQ";
     </script>
     <style>
-        /* Estilos adicionales para el botón del carrito */
+        /* Estilos adicionales para el nuevo diseño sin dropdown */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .welcome-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-right: var(--spacing-lg);
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 0.9rem;
+            font-weight: 500;
+            min-height: 40px;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            background: var(--accent-bg);
+            color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+        }
+
+        .action-btn.primary {
+            background: var(--gradient-accent);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--gradient-accent);
+            color: white;
+            filter: brightness(1.1);
+        }
+
+        .action-btn.danger {
+            background: var(--gradient-danger);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        .action-btn.danger:hover {
+            background: var(--gradient-danger);
+            color: white;
+            filter: brightness(1.1);
+        }
+
         .carrito-btn {
             position: relative;
-            margin-right: var(--spacing-md);
             text-decoration: none;
             color: var(--text-primary);
-            padding: var(--spacing-md) var(--spacing-lg);
+            padding: var(--spacing-sm) var(--spacing-md);
             border: 2px solid var(--accent-blue);
             border-radius: var(--radius-lg);
             background: rgba(0, 212, 255, 0.1);
@@ -33,6 +103,8 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
             display: flex;
             align-items: center;
             gap: var(--spacing-sm);
+            font-weight: 600;
+            min-height: 40px;
         }
 
         .carrito-btn:hover {
@@ -40,6 +112,7 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
             color: white;
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
+            text-decoration: none;
         }
 
         .carrito-contador {
@@ -62,24 +135,109 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
             display: block;
         }
 
-        .btn-carrito {
-            background: var(--gradient-accent);
-            color: white;
-            border: none;
-            padding: var(--spacing-sm) var(--spacing-md);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all var(--transition-normal);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-            font-size: 0.9rem;
-            margin-bottom: var(--spacing-sm);
+        /* Responsive design mejorado */
+        @media (max-width: 1200px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                gap: var(--spacing-xs);
+            }
+            
+            .action-btn {
+                padding: var(--spacing-xs) var(--spacing-sm);
+                font-size: 0.85rem;
+            }
         }
 
-        .btn-carrito:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: var(--spacing-lg);
+                text-align: center;
+                padding: var(--spacing-lg);
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: var(--spacing-md);
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: var(--spacing-md);
+                width: 100%;
+                align-items: center;
+            }
+
+            .welcome-text {
+                margin-right: 0;
+                text-align: center;
+            }
+
+            .action-buttons {
+                justify-content: center;
+                gap: var(--spacing-sm);
+            }
+
+            .action-btn {
+                flex: 1;
+                justify-content: center;
+                min-width: 120px;
+                font-size: 0.85rem;
+            }
+
+            .carrito-btn {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: var(--spacing-sm);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: var(--spacing-md);
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header h1 i {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+                gap: var(--spacing-sm);
+            }
+
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+                min-width: auto;
+            }
+
+            .welcome-text {
+                font-size: 1rem;
+            }
+        }
+
+        /* Separador visual */
+        .user-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: var(--spacing-md);
+        }
+
+        @media (max-width: 768px) {
+            .user-section {
+                align-items: center;
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -91,20 +249,41 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
             <i class="fas fa-graduation-cap"></i>
             Dashboard de Cursos
         </h1>
-        <div class="user-info">
+        
+        <div class="user-section">
             <span class="welcome-text">Bienvenido, <?= htmlspecialchars($_SESSION['nombre']) ?></span>
+            
+            <div class="user-info">
+                <!-- Botón del Carrito -->
+                <a href="/carrito" class="carrito-btn">
+                    <i class="fas fa-shopping-cart"></i>
+                    Mi Carrito
+                    <span id="carrito-contador" class="carrito-contador">0</span>
+                </a>
 
-            <!-- Botón del Carrito -->
-            <a href="/carrito" class="carrito-btn">
-                <i class="fas fa-shopping-cart"></i>
-                Mi Carrito
-                <span id="carrito-contador" class="carrito-contador">0</span>
-            </a>
-
-            <a href="/logout" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-                Cerrar Sesión
-            </a>
+                <!-- Botones de acción directos -->
+                <div class="action-buttons">
+                    <a href="/perfil" class="action-btn">
+                        <i class="fas fa-user-edit"></i>
+                        Perfil
+                    </a>
+                    
+                    <a href="/estadisticas" class="action-btn">
+                        <i class="fas fa-chart-bar"></i>
+                        Estadísticas
+                    </a>
+                    
+                    <a href="/cambiar-password" class="action-btn">
+                        <i class="fas fa-key"></i>
+                        Contraseña
+                    </a>
+                    
+                    <a href="/logout" class="action-btn danger">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Salir
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
