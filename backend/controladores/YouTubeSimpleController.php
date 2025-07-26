@@ -1,6 +1,5 @@
 <?php
 // backend/controladores/YouTubeSimpleController.php
-// Controlador simple para mostrar videos configurados
 
 require_once __DIR__ . '/../modelos/VideoSimple.php';
 

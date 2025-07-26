@@ -1,28 +1,142 @@
 <?php
 // frontend/videos.php
-// Vista simple para mostrar videos de YouTube configurados
+// Vista para mostrar videos de YouTube - CORREGIDA
 
 session_start();
+
+// Verificar autenticación
 if (!isset($_SESSION['cliente_id'])) {
     header('Location: /login');
     exit();
 }
+
+// Obtener datos del usuario para el header
+$nombreUsuario = $_SESSION['cliente_nombre'] ?? 'Usuario';
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Videos del Tema - MVC SISTEMA</title>
+    <title>Videos Educativos - MVC SISTEMA</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="/assets/css/dashboard.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-rgb: 37, 99, 235;
+            --accent-blue: #3b82f6;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --card-bg: #ffffff;
+            --background-light: #f9fafb;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 0.75rem;
+            --spacing-lg: 1rem;
+            --spacing-xl: 1.5rem;
+            --spacing-2xl: 2rem;
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header Navigation */
+        .header-nav {
+            background: var(--card-bg);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--background-light);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--card-bg);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Main Container */
         .videos-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: var(--spacing-lg);
+            padding: 0 var(--spacing-lg);
         }
 
+        /* Page Header */
         .page-header {
             text-align: center;
             margin-bottom: var(--spacing-2xl);
@@ -45,6 +159,7 @@ if (!isset($_SESSION['cliente_id'])) {
             margin: 0;
         }
 
+        /* Filters Section */
         .filters-section {
             background: var(--card-bg);
             padding: var(--spacing-xl);
@@ -87,33 +202,29 @@ if (!isset($_SESSION['cliente_id'])) {
         }
 
         .filter-btn {
-            padding: var(--spacing-sm) var(--spacing-md);
+            padding: var(--spacing-sm) var(--spacing-lg);
             border: 1px solid var(--border-color);
             background: var(--card-bg);
-            color: var(--text-primary);
+            color: var(--text-secondary);
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s ease;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
         }
 
-        .filter-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
+        .filter-btn:hover,
         .filter-btn.active {
             background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
         }
 
+        /* Videos Grid */
         .videos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: var(--spacing-xl);
-            margin-bottom: var(--spacing-xl);
+            margin-bottom: var(--spacing-2xl);
         }
 
         .video-card {
@@ -122,11 +233,10 @@ if (!isset($_SESSION['cliente_id'])) {
             overflow: hidden;
             box-shadow: var(--shadow-sm);
             transition: all 0.3s ease;
-            border: 1px solid var(--border-color);
         }
 
         .video-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-4px);
             box-shadow: var(--shadow-lg);
         }
 
@@ -145,7 +255,7 @@ if (!isset($_SESSION['cliente_id'])) {
             transition: transform 0.3s ease;
         }
 
-        .video-card:hover .video-thumbnail img {
+        .video-thumbnail:hover img {
             transform: scale(1.05);
         }
 
@@ -156,9 +266,9 @@ if (!isset($_SESSION['cliente_id'])) {
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.7);
             color: white;
+            border-radius: 50%;
             width: 60px;
             height: 60px;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -166,8 +276,8 @@ if (!isset($_SESSION['cliente_id'])) {
             transition: all 0.3s ease;
         }
 
-        .video-card:hover .play-overlay {
-            background: rgba(255, 0, 0, 0.9);
+        .video-thumbnail:hover .play-overlay {
+            background: rgba(37, 99, 235, 0.9);
             transform: translate(-50%, -50%) scale(1.1);
         }
 
@@ -179,8 +289,8 @@ if (!isset($_SESSION['cliente_id'])) {
             color: white;
             padding: var(--spacing-xs) var(--spacing-sm);
             border-radius: var(--radius-sm);
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
 
         .video-info {
@@ -188,24 +298,20 @@ if (!isset($_SESSION['cliente_id'])) {
         }
 
         .video-title {
+            font-size: 1.125rem;
             font-weight: 600;
-            font-size: 1.1rem;
-            line-height: 1.4;
             margin-bottom: var(--spacing-sm);
             color: var(--text-primary);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            line-height: 1.4;
         }
 
         .video-description {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             line-height: 1.5;
             margin-bottom: var(--spacing-md);
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -214,21 +320,21 @@ if (!isset($_SESSION['cliente_id'])) {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
         }
 
         .video-category {
-            background: var(--accent-blue);
+            background: var(--primary-color);
             color: white;
             padding: var(--spacing-xs) var(--spacing-sm);
             border-radius: var(--radius-sm);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 500;
         }
 
         .video-date {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
         }
 
         .video-actions {
@@ -238,45 +344,12 @@ if (!isset($_SESSION['cliente_id'])) {
 
         .video-actions .btn {
             flex: 1;
-            padding: var(--spacing-sm);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            gap: var(--spacing-xs);
+            font-size: 0.8rem;
+            padding: var(--spacing-sm) var(--spacing-md);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: var(--spacing-2xl);
-            color: var(--text-secondary);
-            grid-column: 1 / -1;
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: var(--spacing-lg);
-            color: var(--border-color);
-        }
-
-        .loading {
-            text-align: center;
-            padding: var(--spacing-2xl);
-            color: var(--text-secondary);
-            grid-column: 1 / -1;
-        }
-
-        .loading i {
-            font-size: 2rem;
-            margin-bottom: var(--spacing-md);
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
+        /* Modal */
         .video-modal {
             display: none;
             position: fixed;
@@ -285,47 +358,116 @@ if (!isset($_SESSION['cliente_id'])) {
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
+            z-index: 10000;
             align-items: center;
             justify-content: center;
         }
 
         .modal-content {
+            position: relative;
+            width: 90%;
+            max-width: 900px;
             background: var(--card-bg);
             border-radius: var(--radius-lg);
-            padding: var(--spacing-lg);
-            max-width: 90%;
-            max-height: 90%;
-            position: relative;
+            overflow: hidden;
         }
 
-        .modal-close {
-            position: absolute;
-            top: var(--spacing-md);
-            right: var(--spacing-md);
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg);
+            background: var(--background-light);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
             background: none;
             border: none;
             font-size: 1.5rem;
             color: var(--text-secondary);
             cursor: pointer;
-            z-index: 1001;
+            padding: var(--spacing-sm);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
         }
 
-        .modal-close:hover {
-            color: var(--text-primary);
+        .close-btn:hover {
+            background: var(--danger-color);
+            color: white;
         }
 
         .video-embed {
-            width: 800px;
-            height: 450px;
-            max-width: 100%;
+            width: 100%;
+            height: 500px;
             border: none;
-            border-radius: var(--radius-md);
         }
 
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-2xl);
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 0.875rem;
+        }
+
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-2xl);
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-right: var(--spacing-md);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .videos-grid {
-                grid-template-columns: 1fr;
+            .videos-container {
+                padding: 0 var(--spacing-md);
+            }
+
+            .page-header {
+                padding: var(--spacing-lg);
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
             }
 
             .filters-row {
@@ -333,43 +475,52 @@ if (!isset($_SESSION['cliente_id'])) {
                 align-items: stretch;
             }
 
-            .video-embed {
-                width: 100%;
-                height: 250px;
+            .search-box {
+                min-width: unset;
             }
 
-            .page-header h1 {
-                font-size: 2rem;
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .video-embed {
+                height: 300px;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: var(--spacing-md);
             }
         }
     </style>
 </head>
 <body>
-    <div class="videos-container">
-        <!-- Header -->
-        <div class="header">
-            <h1>
+    <!-- Header Navigation -->
+    <div class="header-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
                 <i class="fab fa-youtube"></i>
-                Videos del Tema
-            </h1>
-            <div class="user-info">
+                Videos Educativos
+            </div>
+            <div class="nav-actions">
+                <span>Hola, <?php echo htmlspecialchars($nombreUsuario); ?></span>
                 <a href="/dashboard" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                     Volver al Dashboard
                 </a>
             </div>
         </div>
+    </div>
 
+    <!-- Main Container -->
+    <div class="videos-container">
         <!-- Page Header -->
         <div class="page-header">
-            <h1>
-                <i class="fas fa-play-circle"></i>
-                Videos Educativos
-            </h1>
-            <p>Colección curada de videos relacionados con nuestro tema principal</p>
+            <h1><i class="fab fa-youtube"></i> Videos Educativos</h1>
+            <p>Aprende con nuestros videos tutoriales sobre programación y desarrollo web</p>
         </div>
 
-        <!-- Filtros -->
+        <!-- Filters Section -->
         <div class="filters-section">
             <div class="filters-row">
                 <div class="search-box">
@@ -377,31 +528,34 @@ if (!isset($_SESSION['cliente_id'])) {
                         type="text" 
                         id="searchInput" 
                         class="search-input" 
-                        placeholder="Buscar videos..."
+                        placeholder="Buscar videos por título o descripción..."
                         onkeyup="filtrarVideos()"
                     >
                 </div>
                 <div class="category-filters" id="categoryFilters">
-                    <!-- Se llenarán dinámicamente -->
+                    <!-- Los filtros se cargan dinámicamente -->
                 </div>
             </div>
         </div>
 
-        <!-- Grid de Videos -->
+        <!-- Videos Grid -->
         <div class="videos-grid" id="videosGrid">
-            <div class="loading">
-                <i class="fas fa-spinner"></i>
-                <p>Cargando videos...</p>
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                Cargando videos...
             </div>
         </div>
     </div>
 
-    <!-- Modal para reproducir video -->
-    <div class="video-modal" id="videoModal">
+    <!-- Video Modal -->
+    <div id="videoModal" class="video-modal">
         <div class="modal-content">
-            <button class="modal-close" onclick="cerrarModal()">
-                <i class="fas fa-times"></i>
-            </button>
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Reproduciendo Video</h3>
+                <button class="close-btn" onclick="cerrarModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
             <iframe id="videoEmbed" class="video-embed" allowfullscreen></iframe>
         </div>
     </div>
@@ -412,27 +566,38 @@ if (!isset($_SESSION['cliente_id'])) {
         let videosFiltrados = [];
         let categoriaActiva = '';
 
-        // Inicialización
+        // Inicializar página
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎬 Iniciando página de videos...');
             cargarVideos();
         });
 
         // Cargar videos desde la API
         async function cargarVideos() {
             try {
+                console.log('📡 Cargando videos desde API...');
                 const response = await fetch('/api/videos?action=todos');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                console.log('📊 Respuesta de API:', data);
 
-                if (data.success) {
+                if (data.success && data.videos) {
                     todosLosVideos = data.videos;
                     videosFiltrados = [...todosLosVideos];
+                    
+                    console.log(`✅ Cargados ${todosLosVideos.length} videos`);
                     
                     cargarCategorias();
                     mostrarVideos();
                 } else {
-                    mostrarError('Error al cargar videos: ' + data.error);
+                    mostrarError('Error al cargar videos: ' + (data.error || 'Respuesta inválida'));
                 }
             } catch (error) {
+                console.error('❌ Error cargando videos:', error);
                 mostrarError('Error de conexión: ' + error.message);
             }
         }
@@ -557,6 +722,8 @@ if (!isset($_SESSION['cliente_id'])) {
 
         // Abrir video en modal
         function abrirVideo(videoId) {
+            console.log('🎬 Abriendo video:', videoId);
+            
             const modal = document.getElementById('videoModal');
             const embed = document.getElementById('videoEmbed');
             
@@ -601,6 +768,10 @@ if (!isset($_SESSION['cliente_id'])) {
                     <i class="fas fa-exclamation-triangle"></i>
                     <h3>Error</h3>
                     <p>${mensaje}</p>
+                    <button onclick="cargarVideos()" class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-redo"></i>
+                        Reintentar
+                    </button>
                 </div>
             `;
         }
