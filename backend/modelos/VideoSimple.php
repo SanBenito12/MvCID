@@ -44,7 +44,7 @@ class VideoSimple
                     'tags' => ['html', 'css', 'web', 'frontend', 'responsive']
                 ],
                 [
-                    'id' => 'hX4H1WzH-QU',
+                    'id' => 'OuJerKzV5T0',
                     'titulo' => 'Curso MySQL en Español | Desde cero',
                     'descripcion' => 'Curso completo de base de datos MySQL desde cero. Consultas, índices, procedimientos y optimización.',
                     'categoria' => 'Bases de Datos',
@@ -54,7 +54,7 @@ class VideoSimple
                     'tags' => ['mysql', 'base-de-datos', 'sql', 'backend']
                 ],
                 [
-                    'id' => 'gT0Lh1eYk78',
+                    'id' => 'nPCJAx5c1uE',
                     'titulo' => 'PHP con MySQL | Sistema Web Paso a Paso',
                     'descripcion' => 'Aprende a conectar PHP con MySQL creando un sistema web funcional. CRUD completo y autenticación.',
                     'categoria' => 'PHP',
@@ -84,7 +84,7 @@ class VideoSimple
                     'tags' => ['react', 'javascript', 'frontend', 'spa', 'hooks']
                 ],
                 [
-                    'id' => 'MtCrVQX8-PQ',
+                    'id' => 'JD6VNRdGl98',
                     'titulo' => 'API REST con PHP y MySQL',
                     'descripcion' => 'Crea una API REST profesional con PHP y MySQL. JWT, validaciones y documentación.',
                     'categoria' => 'PHP',
