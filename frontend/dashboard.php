@@ -330,6 +330,13 @@ if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
         </div>
     </div>
 
+    <div class="quick-action">
+    <a href="/videos" class="btn btn-primary" style="background: linear-gradient(135deg, #ff0000, #cc0000); width: 100%; padding: 1rem; font-size: 1.1rem;">
+        <i class="fab fa-youtube"></i>
+        Ver Videos Educativos
+    </a>
+</div>
+
     <!-- Crear Curso -->
     <div class="form-container">
         <div class="form-header">

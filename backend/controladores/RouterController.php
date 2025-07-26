@@ -137,6 +137,12 @@ class RouterController
             case '/password':
                 $this->serveFrontendPage('cambiar-password.php');
                 return true;
+            
+            case '/videos':
+            case '/videos.php':
+            case '/youtube':
+                $this->serveFrontendPage('videos.php');
+                return true;
 
             case '/perfil':
             case '/perfil.php':
@@ -199,7 +205,7 @@ class RouterController
     private function redirectToLogin()
     {
         session_start();
-        if (isset($_SESSION['id_cliente']) && isset($_SESSION['llave_secreta'])) {
+        if (isset($_SESSION['cliente_id'])) {
             header("Location: /dashboard");
         } else {
             header("Location: /login");
@@ -208,16 +214,17 @@ class RouterController
     }
 
     /**
-     * Servir página del frontend
+     * Servir página del frontend - SIN VERIFICACIÓN DE SESIÓN AQUÍ
      */
     private function serveFrontendPage($page)
     {
         $filePath = $this->projectRoot . '/frontend/' . $page;
 
         if (file_exists($filePath)) {
+            error_log("✅ Sirviendo página: $page");
             require_once $filePath;
         } else {
-            error_log("Frontend page not found: $filePath");
+            error_log("❌ Frontend page not found: $filePath");
             
             // Si es una página que requiere autenticación, crear una página genérica
             if (in_array($page, ['cambiar-password.php', 'perfil.php', 'configuracion.php'])) {
@@ -234,7 +241,7 @@ class RouterController
     private function createGenericAuthPage($page)
     {
         session_start();
-        if (!isset($_SESSION['id_cliente']) || !isset($_SESSION['llave_secreta'])) {
+        if (!isset($_SESSION['cliente_id'])) {
             header("Location: /login");
             exit;
         }
@@ -257,7 +264,7 @@ class RouterController
             case 'configuracion.php':
                 $pageTitle = 'Configuración';
                 $pageIcon = 'fas fa-cog';
-                $pageDescription = 'Esta página está en construcción. Las opciones de configuración están disponibles en el dashboard.';
+                $pageDescription = 'Esta página están construcción. Las opciones de configuración están disponibles en el dashboard.';
                 break;
         }
 
@@ -392,7 +399,7 @@ class RouterController
                 return true;
             }
 
-            // Rutas de carrito - NUEVA FUNCIONALIDAD
+            // Rutas de carrito
             if (preg_match('#^/api/carrito/?$#', $this->uri)) {
                 require_once $this->projectRoot . '/backend/api/carrito.php';
                 return true;
@@ -401,6 +408,12 @@ class RouterController
             // Ruta de autenticación
             if (preg_match('#^/api/auth/?$#', $this->uri)) {
                 require_once $this->projectRoot . '/backend/api/auth.php';
+                return true;
+            }
+
+            // Rutas de videos de YouTube - NUEVA FUNCIONALIDAD
+            if (preg_match('#^/api/videos/?$#', $this->uri)) {
+                require_once $this->projectRoot . '/backend/api/videos.php';
                 return true;
             }
 
@@ -441,7 +454,8 @@ class RouterController
         $allowedBackendRoutes = [
             '/backend/api/metodos_pago.php' => '/backend/api/metodos_pago.php',
             '/backend/api/carrito.php' => '/backend/api/carrito.php',
-            '/backend/api/clientes.php' => '/backend/api/clientes.php'
+            '/backend/api/clientes.php' => '/backend/api/clientes.php',
+            '/backend/api/videos.php' => '/backend/api/videos.php'
         ];
 
         if (isset($allowedBackendRoutes[$this->uri])) {
@@ -451,7 +465,7 @@ class RouterController
 
         // Bloquear acceso directo a otros archivos del backend
         http_response_code(403);
-        echo json_encode(["error" => "Acceso no permitido"]);
+        echo json_encode(["error" => "Acceso denegado"]);
         return true;
     }
 
@@ -462,21 +476,18 @@ class RouterController
     {
         http_response_code(404);
         echo json_encode([
-            "error" => "Ruta API no encontrada",
+            "error" => "API endpoint no encontrado",
             "uri" => $this->uri,
             "method" => $this->method,
-            "available_routes" => [
+            "available_endpoints" => [
                 "POST /api/clientes/login",
-                "POST /api/clientes/login-legacy",
                 "POST /api/clientes/registro",
-                "POST /api/clientes/cambiar-password",
-                "GET /api/clientes",
-                "GET|POST|PATCH|DELETE /api/cursos",
-                "GET|POST /api/compras",
-                "GET|POST|PATCH|DELETE /api/metodos-pago",
-                "GET|POST|DELETE|PATCH /api/carrito",
-                "GET /api/auth",
-                "GET /api/test-connection"
+                "GET /api/cursos",
+                "GET /api/compras",
+                "GET /api/metodos-pago",
+                "GET /api/carrito",
+                "GET /api/videos",
+                "GET /api/auth"
             ]
         ]);
     }
@@ -484,44 +495,22 @@ class RouterController
     /**
      * Manejar errores de API
      */
-    private function handleApiError($exception)
+    private function handleApiError($e)
     {
-        error_log("API Error: " . $exception->getMessage());
+        error_log("API Error: " . $e->getMessage());
         http_response_code(500);
         echo json_encode([
-            "error" => "Error interno del servidor",
-            "message" => $exception->getMessage(),
-            "timestamp" => date('Y-m-d H:i:s')
+            "error" => "Error interno de la API",
+            "message" => "Se produjo un error inesperado"
         ]);
     }
 
     /**
-     * Manejar 404 - Página no encontrada
+     * Manejar 404
      */
     private function handle404()
     {
         http_response_code(404);
-
-        // Si es una petición de API, devolver JSON
-        if (strpos($this->uri, '/api/') === 0) {
-            header('Content-Type: application/json');
-            echo json_encode([
-                "error" => "Endpoint no encontrado",
-                "uri" => $this->uri,
-                "method" => $this->method
-            ]);
-            return;
-        }
-
-        // Para peticiones web, mostrar página 404
-        $this->show404Page();
-    }
-
-    /**
-     * Mostrar página 404 personalizada
-     */
-    private function show404Page()
-    {
         ?>
         <!DOCTYPE html>
         <html lang="es">
@@ -529,9 +518,10 @@ class RouterController
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>404 - Página no encontrada</title>
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
             <style>
                 body {
-                    font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+                    font-family: 'Inter', sans-serif;
                     background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
                     min-height: 100vh;
                     display: flex;
@@ -550,44 +540,32 @@ class RouterController
                     border: 1px solid rgba(255, 255, 255, 0.1);
                     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
                     max-width: 600px;
-                    position: relative;
-                    overflow: hidden;
-                }
-                .error-container::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    height: 4px;
-                    background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
                 }
                 h1 {
                     font-size: 4rem;
                     margin: 0 0 20px 0;
-                    background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+                    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
-                    background-clip: text;
                 }
-                p {
-                    font-size: 1.2rem;
-                    margin: 20px 0;
-                    color: #b8c5d6;
-                    line-height: 1.6;
+                p { font-size: 1.2rem; margin: 20px 0; color: #b8c5d6; }
+                .links {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                    justify-content: center;
+                    margin-top: 30px;
                 }
                 a {
                     color: #00d4ff;
                     text-decoration: none;
                     font-weight: bold;
-                    font-size: 1.1rem;
-                    display: inline-block;
-                    padding: 12px 24px;
+                    padding: 12px 20px;
                     background: rgba(0, 212, 255, 0.1);
                     border-radius: 12px;
                     border: 1px solid rgba(0, 212, 255, 0.3);
                     transition: all 0.3s ease;
-                    margin: 10px;
+                    font-size: 0.9rem;
                 }
                 a:hover {
                     background: rgba(0, 212, 255, 0.2);
@@ -603,9 +581,6 @@ class RouterController
                     font-size: 0.9rem;
                     color: #8892a6;
                     border: 1px solid rgba(255, 255, 255, 0.1);
-                }
-                .links {
-                    margin-top: 30px;
                 }
                 @media (max-width: 768px) {
                     .error-container { padding: 40px 20px; }
@@ -627,6 +602,7 @@ class RouterController
                 <a href="/registro">👤 Registro</a>
                 <a href="/dashboard">📊 Dashboard</a>
                 <a href="/carrito">🛒 Carrito</a>
+                <a href="/videos">🎬 Videos</a>
             </div>
 
             <div class="debug">
@@ -669,6 +645,7 @@ class RouterController
                 '/cambiar-password' => 'Cambiar contraseña',
                 '/perfil' => 'Perfil de usuario',
                 '/configuracion' => 'Configuración',
+                '/videos' => 'Videos educativos de YouTube',
                 '/logout' => 'Cerrar sesión'
             ],
             'api_routes' => [
@@ -682,6 +659,7 @@ class RouterController
                 'GET /api/metodos-pago' => 'Métodos de pago',
                 'GET|POST|DELETE|PATCH /api/carrito' => 'Gestión del carrito',
                 'GET /api/auth' => 'Validación de autenticación',
+                'GET /api/videos' => 'Gestión de videos de YouTube',
                 'GET /api/test-connection' => 'Prueba de conexión'
             ]
         ];

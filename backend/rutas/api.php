@@ -1,8 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/db.php';
-
 $route = $_SERVER['API_ROUTE'] ?? '';
-
 if (empty($route)) {
     $uri = $_SERVER['REQUEST_URI'];
     $method = $_SERVER['REQUEST_METHOD'];
@@ -51,6 +49,20 @@ switch ($route) {
         
     case "POST /compras":
         require_once __DIR__ . "/../api/compras.php";
+        break;
+    
+    // === VIDEOS - AGREGADO ===
+    case "GET /videos":
+        session_start();
+        if (!isset($_SESSION['cliente_id'])) {
+            header('Location: /login');
+            exit();
+        }
+        require_once __DIR__ . '/../../frontend/videos.php';
+        break;
+    
+    case "GET /api/videos":
+        require_once __DIR__ . "/../api/videos.php";
         break;
     
     // === RUTA NO ENCONTRADA ===
