@@ -137,6 +137,12 @@ class RouterController
             case '/password':
                 $this->serveFrontendPage('cambiar-password.php');
                 return true;
+            
+            case '/videos':
+            case '/videos.php':
+            case '/youtube':
+                $this->serveFrontendPage('videos.php');
+                return true;
 
             case '/perfil':
             case '/perfil.php':
@@ -392,7 +398,7 @@ class RouterController
                 return true;
             }
 
-            // Rutas de carrito - NUEVA FUNCIONALIDAD
+            // Rutas de carrito
             if (preg_match('#^/api/carrito/?$#', $this->uri)) {
                 require_once $this->projectRoot . '/backend/api/carrito.php';
                 return true;
@@ -401,6 +407,12 @@ class RouterController
             // Ruta de autenticación
             if (preg_match('#^/api/auth/?$#', $this->uri)) {
                 require_once $this->projectRoot . '/backend/api/auth.php';
+                return true;
+            }
+
+            // Rutas de videos de YouTube - NUEVA FUNCIONALIDAD
+            if (preg_match('#^/api/videos/?$#', $this->uri)) {
+                require_once $this->projectRoot . '/backend/api/videos.php';
                 return true;
             }
 
@@ -441,7 +453,8 @@ class RouterController
         $allowedBackendRoutes = [
             '/backend/api/metodos_pago.php' => '/backend/api/metodos_pago.php',
             '/backend/api/carrito.php' => '/backend/api/carrito.php',
-            '/backend/api/clientes.php' => '/backend/api/clientes.php'
+            '/backend/api/clientes.php' => '/backend/api/clientes.php',
+            '/backend/api/videos.php' => '/backend/api/videos.php'
         ];
 
         if (isset($allowedBackendRoutes[$this->uri])) {
@@ -476,6 +489,7 @@ class RouterController
                 "GET|POST|PATCH|DELETE /api/metodos-pago",
                 "GET|POST|DELETE|PATCH /api/carrito",
                 "GET /api/auth",
+                "GET /api/videos",
                 "GET /api/test-connection"
             ]
         ]);
@@ -627,6 +641,7 @@ class RouterController
                 <a href="/registro">👤 Registro</a>
                 <a href="/dashboard">📊 Dashboard</a>
                 <a href="/carrito">🛒 Carrito</a>
+                <a href="/videos">🎬 Videos</a>
             </div>
 
             <div class="debug">
@@ -669,6 +684,7 @@ class RouterController
                 '/cambiar-password' => 'Cambiar contraseña',
                 '/perfil' => 'Perfil de usuario',
                 '/configuracion' => 'Configuración',
+                '/videos' => 'Videos educativos de YouTube',
                 '/logout' => 'Cerrar sesión'
             ],
             'api_routes' => [
@@ -682,6 +698,7 @@ class RouterController
                 'GET /api/metodos-pago' => 'Métodos de pago',
                 'GET|POST|DELETE|PATCH /api/carrito' => 'Gestión del carrito',
                 'GET /api/auth' => 'Validación de autenticación',
+                'GET /api/videos' => 'Gestión de videos de YouTube',
                 'GET /api/test-connection' => 'Prueba de conexión'
             ]
         ];
