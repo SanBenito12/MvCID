@@ -1,142 +1,29 @@
 <?php
 // frontend/videos.php
-// Vista para mostrar videos de YouTube - CORREGIDA
+// Vista simple para mostrar videos de YouTube configurados
 
 session_start();
-
-// Verificar autenticación
-if (!isset($_SESSION['cliente_id'])) {
+// CORRECCIÓN: Cambiar 'cliente_id' por 'id_cliente'
+if (!isset($_SESSION['id_cliente'])) {
     header('Location: /login');
     exit();
 }
-
-// Obtener datos del usuario para el header
-$nombreUsuario = $_SESSION['cliente_nombre'] ?? 'Usuario';
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Videos Educativos - MVC SISTEMA</title>
+    <title>Videos del Tema - MVC SISTEMA</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/assets/css/dashboard.css" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --primary-rgb: 37, 99, 235;
-            --accent-blue: #3b82f6;
-            --success-color: #059669;
-            --warning-color: #d97706;
-            --danger-color: #dc2626;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --text-muted: #9ca3af;
-            --border-color: #e5e7eb;
-            --card-bg: #ffffff;
-            --background-light: #f9fafb;
-            --spacing-xs: 0.25rem;
-            --spacing-sm: 0.5rem;
-            --spacing-md: 0.75rem;
-            --spacing-lg: 1rem;
-            --spacing-xl: 1.5rem;
-            --spacing-2xl: 2rem;
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--background-light);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        /* Header Navigation */
-        .header-nav {
-            background: var(--card-bg);
-            box-shadow: var(--shadow-sm);
-            padding: var(--spacing-lg);
-            margin-bottom: var(--spacing-xl);
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: var(--spacing-md);
-            align-items: center;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-md) var(--spacing-lg);
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1d4ed8;
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: var(--background-light);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: var(--card-bg);
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        /* Main Container */
         .videos-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 var(--spacing-lg);
+            padding: var(--spacing-lg);
         }
 
-        /* Page Header */
         .page-header {
             text-align: center;
             margin-bottom: var(--spacing-2xl);
@@ -159,7 +46,6 @@ $nombreUsuario = $_SESSION['cliente_nombre'] ?? 'Usuario';
             margin: 0;
         }
 
-        /* Filters Section */
         .filters-section {
             background: var(--card-bg);
             padding: var(--spacing-xl);
@@ -201,61 +87,71 @@ $nombreUsuario = $_SESSION['cliente_nombre'] ?? 'Usuario';
             flex-wrap: wrap;
         }
 
-        .filter-btn {
-            padding: var(--spacing-sm) var(--spacing-lg);
+        .category-btn {
+            padding: var(--spacing-sm) var(--spacing-md);
             border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-secondary);
             border-radius: var(--radius-md);
+            background: var(--secondary-bg);
+            color: var(--text-primary);
             cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.875rem;
+            transition: all var(--transition-normal);
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        .filter-btn:hover,
-        .filter-btn.active {
-            background: var(--primary-color);
+        .category-btn:hover {
+            background: var(--accent-bg);
+            color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .category-btn.active {
+            background: var(--gradient-accent);
             color: white;
-            border-color: var(--primary-color);
+            border-color: var(--accent-blue);
         }
 
-        /* Videos Grid */
         .videos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: var(--spacing-xl);
             margin-bottom: var(--spacing-2xl);
         }
 
         .video-card {
             background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             overflow: hidden;
+            transition: all var(--transition-normal);
+            cursor: pointer;
             box-shadow: var(--shadow-sm);
-            transition: all 0.3s ease;
         }
 
         .video-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-lg);
+            border-color: var(--accent-blue);
         }
 
         .video-thumbnail {
             position: relative;
             width: 100%;
-            height: 200px;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
             overflow: hidden;
-            cursor: pointer;
         }
 
         .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s ease;
+            transition: transform var(--transition-normal);
         }
 
-        .video-thumbnail:hover img {
+        .video-card:hover .video-thumbnail img {
             transform: scale(1.05);
         }
 
@@ -264,33 +160,25 @@ $nombreUsuario = $_SESSION['cliente_nombre'] ?? 'Usuario';
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
+            width: 64px;
+            height: 64px;
+            background: rgba(0, 0, 0, 0.8);
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
         }
 
-        .video-thumbnail:hover .play-overlay {
-            background: rgba(37, 99, 235, 0.9);
+        .video-card:hover .play-overlay {
+            background: var(--accent-red);
             transform: translate(-50%, -50%) scale(1.1);
         }
 
-        .video-duration {
-            position: absolute;
-            bottom: var(--spacing-sm);
-            right: var(--spacing-sm);
-            background: rgba(0, 0, 0, 0.8);
+        .play-overlay i {
             color: white;
-            padding: var(--spacing-xs) var(--spacing-sm);
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            font-weight: 500;
+            font-size: 24px;
+            margin-left: 4px;
         }
 
         .video-info {
@@ -298,18 +186,11 @@ $nombreUsuario = $_SESSION['cliente_nombre'] ?? 'Usuario';
         }
 
         .video-title {
-            font-size: 1.125rem;
+            font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: var(--spacing-sm);
             color: var(--text-primary);
-            line-height: 1.4;
-        }
-
-        .video-description {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            line-height: 1.5;
-            margin-bottom: var(--spacing-md);
+            line-height: 1.3;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -318,38 +199,28 @@ $nombreUsuario = $_SESSION['cliente_nombre'] ?? 'Usuario';
 
         .video-meta {
             display: flex;
-            justify-content: space-between;
+            gap: var(--spacing-md);
             align-items: center;
-            margin-bottom: var(--spacing-lg);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .video-duration {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
         }
 
         .video-category {
-            background: var(--primary-color);
-            color: white;
+            display: inline-block;
             padding: var(--spacing-xs) var(--spacing-sm);
+            background: var(--accent-bg);
+            color: var(--accent-blue);
             border-radius: var(--radius-sm);
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
-        .video-date {
-            color: var(--text-muted);
-            font-size: 0.75rem;
-        }
-
-        .video-actions {
-            display: flex;
-            gap: var(--spacing-sm);
-        }
-
-        .video-actions .btn {
-            flex: 1;
-            justify-content: center;
-            font-size: 0.8rem;
-            padding: var(--spacing-sm) var(--spacing-md);
-        }
-
-        /* Modal */
         .video-modal {
             display: none;
             position: fixed;
@@ -357,19 +228,24 @@ $nombreUsuario = $_SESSION['cliente_nombre'] ?? 'Usuario';
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 10000;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            animation: fadeIn var(--transition-normal);
+        }
+
+        .video-modal.active {
+            display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .modal-content {
-            position: relative;
             width: 90%;
-            max-width: 900px;
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
+            max-width: 1000px;
+            background: var(--primary-bg);
+            border-radius: var(--radius-xl);
             overflow: hidden;
+            animation: slideIn var(--transition-normal);
         }
 
         .modal-header {
@@ -377,414 +253,376 @@ $nombreUsuario = $_SESSION['cliente_nombre'] ?? 'Usuario';
             justify-content: space-between;
             align-items: center;
             padding: var(--spacing-lg);
-            background: var(--background-light);
             border-bottom: 1px solid var(--border-color);
         }
 
-        .modal-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .close-btn {
-            background: none;
+        .modal-close {
+            width: 40px;
+            height: 40px;
             border: none;
-            font-size: 1.5rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: var(--spacing-sm);
+            background: var(--secondary-bg);
             border-radius: var(--radius-md);
-            transition: all 0.2s ease;
-        }
-
-        .close-btn:hover {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        .video-embed {
-            width: 100%;
-            height: 500px;
-            border: none;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: var(--spacing-2xl);
-            color: var(--text-secondary);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: var(--spacing-lg);
-            color: var(--text-muted);
-        }
-
-        .empty-state h3 {
-            font-size: 1.25rem;
-            margin-bottom: var(--spacing-md);
-            color: var(--text-primary);
-        }
-
-        .empty-state p {
-            font-size: 0.875rem;
-        }
-
-        /* Loading State */
-        .loading-state {
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: var(--spacing-2xl);
-            color: var(--text-secondary);
+            transition: all var(--transition-normal);
         }
 
-        .loading-spinner {
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--primary-color);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin-right: var(--spacing-md);
+        .modal-close:hover {
+            background: var(--accent-red);
+            color: white;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .video-player {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
         }
 
-        /* Responsive */
+        .video-player iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .no-videos {
+            text-align: center;
+            padding: var(--spacing-3xl);
+            color: var(--text-muted);
+        }
+
+        .no-videos i {
+            font-size: 4rem;
+            color: var(--border-color);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            transition: all var(--transition-normal);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .back-btn:hover {
+            background: var(--accent-bg);
+            color: var(--accent-blue);
+            transform: translateX(-4px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @media (max-width: 768px) {
-            .videos-container {
-                padding: 0 var(--spacing-md);
-            }
-
-            .page-header {
-                padding: var(--spacing-lg);
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-
-            .filters-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .search-box {
-                min-width: unset;
-            }
-
             .videos-grid {
                 grid-template-columns: 1fr;
             }
 
-            .video-embed {
-                height: 300px;
+            .filters-row {
+                flex-direction: column;
             }
 
-            .nav-container {
-                flex-direction: column;
-                gap: var(--spacing-md);
+            .search-box {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-width: none;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header Navigation -->
-    <div class="header-nav">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <i class="fab fa-youtube"></i>
-                Videos Educativos
-            </div>
-            <div class="nav-actions">
-                <span>Hola, <?php echo htmlspecialchars($nombreUsuario); ?></span>
-                <a href="/dashboard" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i>
-                    Volver al Dashboard
-                </a>
-            </div>
-        </div>
+
+<div class="videos-container">
+    <a href="/dashboard" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        Volver al Dashboard
+    </a>
+
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-play-circle"></i>
+            Videos del Tema
+        </h1>
+        <p>Explora nuestra colección de videos educativos</p>
     </div>
 
-    <!-- Main Container -->
-    <div class="videos-container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1><i class="fab fa-youtube"></i> Videos Educativos</h1>
-            <p>Aprende con nuestros videos tutoriales sobre programación y desarrollo web</p>
-        </div>
-
-        <!-- Filters Section -->
-        <div class="filters-section">
-            <div class="filters-row">
-                <div class="search-box">
-                    <input 
-                        type="text" 
-                        id="searchInput" 
-                        class="search-input" 
-                        placeholder="Buscar videos por título o descripción..."
-                        onkeyup="filtrarVideos()"
-                    >
-                </div>
-                <div class="category-filters" id="categoryFilters">
-                    <!-- Los filtros se cargan dinámicamente -->
-                </div>
+    <div class="filters-section">
+        <div class="filters-row">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput"
+                    placeholder="Buscar videos..."
+                >
             </div>
-        </div>
-
-        <!-- Videos Grid -->
-        <div class="videos-grid" id="videosGrid">
-            <div class="loading-state">
-                <div class="loading-spinner"></div>
-                Cargando videos...
-            </div>
-        </div>
-    </div>
-
-    <!-- Video Modal -->
-    <div id="videoModal" class="video-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Reproduciendo Video</h3>
-                <button class="close-btn" onclick="cerrarModal()">
-                    <i class="fas fa-times"></i>
+            <div class="category-filters" id="categoryFilters">
+                <button class="category-btn active" data-category="">
+                    Todos
                 </button>
             </div>
-            <iframe id="videoEmbed" class="video-embed" allowfullscreen></iframe>
         </div>
     </div>
 
-    <script>
-        // Variables globales
-        let todosLosVideos = [];
-        let videosFiltrados = [];
-        let categoriaActiva = '';
+    <div class="videos-grid" id="videosGrid">
+        <!-- Los videos se cargarán aquí dinámicamente -->
+    </div>
 
-        // Inicializar página
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎬 Iniciando página de videos...');
-            cargarVideos();
-        });
+    <div class="no-videos" id="noVideos" style="display: none;">
+        <i class="fas fa-video-slash"></i>
+        <h3>No se encontraron videos</h3>
+        <p>Intenta con otros filtros de búsqueda</p>
+    </div>
+</div>
 
-        // Cargar videos desde la API
-        async function cargarVideos() {
-            try {
-                console.log('📡 Cargando videos desde API...');
-                const response = await fetch('/api/videos?action=todos');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('📊 Respuesta de API:', data);
+<!-- Modal para reproducir videos -->
+<div class="video-modal" id="videoModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Título del Video</h3>
+            <button class="modal-close" onclick="closeVideoModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="video-player" id="videoPlayer">
+            <!-- El iframe del video se insertará aquí -->
+        </div>
+    </div>
+</div>
 
-                if (data.success && data.videos) {
-                    todosLosVideos = data.videos;
-                    videosFiltrados = [...todosLosVideos];
-                    
-                    console.log(`✅ Cargados ${todosLosVideos.length} videos`);
-                    
-                    cargarCategorias();
-                    mostrarVideos();
-                } else {
-                    mostrarError('Error al cargar videos: ' + (data.error || 'Respuesta inválida'));
-                }
-            } catch (error) {
-                console.error('❌ Error cargando videos:', error);
-                mostrarError('Error de conexión: ' + error.message);
-            }
+<script>
+// Variables globales
+let videosData = [];
+let filteredVideos = [];
+let currentCategory = '';
+let searchTerm = '';
+
+// Cargar videos al iniciar
+document.addEventListener('DOMContentLoaded', () => {
+    cargarVideos();
+    configurarEventos();
+});
+
+// Configurar eventos
+function configurarEventos() {
+    // Búsqueda con debounce
+    let searchTimeout;
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchTerm = e.target.value.toLowerCase();
+            filtrarVideos();
+        }, 300);
+    });
+
+    // Cerrar modal con ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('videoModal').classList.contains('active')) {
+            closeVideoModal();
         }
+    });
 
-        // Cargar filtros de categorías
-        async function cargarCategorias() {
-            try {
-                const response = await fetch('/api/videos?action=categorias');
-                const data = await response.json();
-
-                if (data.success) {
-                    const container = document.getElementById('categoryFilters');
-                    
-                    // Botón "Todas"
-                    container.innerHTML = `
-                        <button class="filter-btn active" onclick="filtrarPorCategoria('')">
-                            Todas
-                        </button>
-                    `;
-
-                    // Botones de categorías
-                    data.categorias.forEach(categoria => {
-                        container.innerHTML += `
-                            <button class="filter-btn" onclick="filtrarPorCategoria('${categoria}')">
-                                ${categoria}
-                            </button>
-                        `;
-                    });
-                }
-            } catch (error) {
-                console.error('Error al cargar categorías:', error);
-            }
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('videoModal').addEventListener('click', (e) => {
+        if (e.target.id === 'videoModal') {
+            closeVideoModal();
         }
+    });
+}
 
-        // Mostrar videos en el grid
-        function mostrarVideos() {
-            const container = document.getElementById('videosGrid');
+// Cargar videos desde la API
+async function cargarVideos() {
+    try {
+        const response = await fetch('/api/videos?action=todos');
+        const data = await response.json();
+
+        if (data.success) {
+            videosData = data.videos;
+            filteredVideos = [...videosData];
             
-            if (videosFiltrados.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-search"></i>
-                        <h3>No se encontraron videos</h3>
-                        <p>Intenta ajustar los filtros de búsqueda</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const videosHtml = videosFiltrados.map(video => `
-                <div class="video-card">
-                    <div class="video-thumbnail" onclick="abrirVideo('${video.id}')">
-                        <img src="https://img.youtube.com/vi/${video.id}/mqdefault.jpg" 
-                             alt="${video.titulo}" 
-                             loading="lazy">
-                        <div class="play-overlay">
-                            <i class="fas fa-play"></i>
-                        </div>
-                        <div class="video-duration">${video.duracion}</div>
-                    </div>
-                    <div class="video-info">
-                        <h3 class="video-title">${video.titulo}</h3>
-                        <p class="video-description">${video.descripcion}</p>
-                        <div class="video-meta">
-                            <span class="video-category">${video.categoria}</span>
-                            <span class="video-date">${formatearFecha(video.fecha)}</span>
-                        </div>
-                        <div class="video-actions">
-                            <button onclick="abrirVideo('${video.id}')" class="btn btn-primary">
-                                <i class="fas fa-play"></i>
-                                Ver Video
-                            </button>
-                            <a href="https://www.youtube.com/watch?v=${video.id}" 
-                               target="_blank" class="btn btn-secondary">
-                                <i class="fas fa-external-link-alt"></i>
-                                YouTube
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-
-            container.innerHTML = videosHtml;
-        }
-
-        // Filtrar por categoría
-        function filtrarPorCategoria(categoria) {
-            categoriaActiva = categoria;
+            // Cargar categorías
+            cargarCategorias();
             
-            // Actualizar botones activos
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            aplicarFiltros();
-        }
-
-        // Filtrar por texto de búsqueda
-        function filtrarVideos() {
-            aplicarFiltros();
-        }
-
-        // Aplicar todos los filtros
-        function aplicarFiltros() {
-            const termino = document.getElementById('searchInput').value.toLowerCase();
-            
-            videosFiltrados = todosLosVideos.filter(video => {
-                // Filtro por categoría
-                const coincideCategoria = !categoriaActiva || video.categoria === categoriaActiva;
-                
-                // Filtro por búsqueda de texto
-                const coincideTexto = !termino || 
-                    video.titulo.toLowerCase().includes(termino) ||
-                    video.descripcion.toLowerCase().includes(termino);
-                
-                return coincideCategoria && coincideTexto;
-            });
-
+            // Mostrar videos
             mostrarVideos();
+        } else {
+            console.error('Error al cargar videos:', data.error);
+            mostrarMensajeError();
         }
+    } catch (error) {
+        console.error('Error de conexión:', error);
+        mostrarMensajeError();
+    }
+}
 
-        // Abrir video en modal
-        function abrirVideo(videoId) {
-            console.log('🎬 Abriendo video:', videoId);
-            
-            const modal = document.getElementById('videoModal');
-            const embed = document.getElementById('videoEmbed');
-            
-            embed.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-            modal.style.display = 'flex';
-            
-            // Prevenir scroll del body
-            document.body.style.overflow = 'hidden';
-        }
+// Cargar categorías disponibles
+async function cargarCategorias() {
+    try {
+        const response = await fetch('/api/videos?action=categorias');
+        const data = await response.json();
 
-        // Cerrar modal
-        function cerrarModal() {
-            const modal = document.getElementById('videoModal');
-            const embed = document.getElementById('videoEmbed');
+        if (data.success && data.categorias.length > 0) {
+            const container = document.getElementById('categoryFilters');
             
-            embed.src = '';
-            modal.style.display = 'none';
-            
-            // Restaurar scroll del body
-            document.body.style.overflow = 'auto';
-        }
-
-        // Cerrar modal al hacer clic fuera del contenido
-        document.getElementById('videoModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                cerrarModal();
-            }
-        });
-
-        // Cerrar modal con tecla Escape
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                cerrarModal();
-            }
-        });
-
-        // Mostrar error
-        function mostrarError(mensaje) {
-            const container = document.getElementById('videosGrid');
+            // Mantener el botón "Todos"
             container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>Error</h3>
-                    <p>${mensaje}</p>
-                    <button onclick="cargarVideos()" class="btn btn-primary" style="margin-top: 1rem;">
-                        <i class="fas fa-redo"></i>
-                        Reintentar
-                    </button>
-                </div>
+                <button class="category-btn active" data-category="" onclick="cambiarCategoria('')">
+                    Todos
+                </button>
             `;
-        }
 
-        // Formatear fecha
-        function formatearFecha(fecha) {
-            const date = new Date(fecha);
-            return date.toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
+            // Agregar categorías
+            data.categorias.forEach(categoria => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.dataset.category = categoria;
+                btn.textContent = categoria;
+                btn.onclick = () => cambiarCategoria(categoria);
+                container.appendChild(btn);
             });
         }
-    </script>
+    } catch (error) {
+        console.error('Error al cargar categorías:', error);
+    }
+}
+
+// Cambiar categoría
+function cambiarCategoria(categoria) {
+    currentCategory = categoria;
+    
+    // Actualizar botones
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        if (btn.dataset.category === categoria) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    filtrarVideos();
+}
+
+// Filtrar videos
+function filtrarVideos() {
+    filteredVideos = videosData.filter(video => {
+        const matchesCategory = !currentCategory || video.categoria === currentCategory;
+        const matchesSearch = !searchTerm || 
+            video.titulo.toLowerCase().includes(searchTerm) ||
+            (video.descripcion && video.descripcion.toLowerCase().includes(searchTerm));
+        
+        return matchesCategory && matchesSearch;
+    });
+
+    mostrarVideos();
+}
+
+// Mostrar videos en la grilla
+function mostrarVideos() {
+    const grid = document.getElementById('videosGrid');
+    const noVideos = document.getElementById('noVideos');
+
+    if (filteredVideos.length === 0) {
+        grid.innerHTML = '';
+        noVideos.style.display = 'block';
+        return;
+    }
+
+    noVideos.style.display = 'none';
+    
+    grid.innerHTML = filteredVideos.map(video => `
+        <div class="video-card" onclick="abrirVideo('${video.id}', '${video.titulo.replace(/'/g, "\\'")}')">
+            <div class="video-thumbnail">
+                <img src="https://img.youtube.com/vi/${video.id}/maxresdefault.jpg" 
+                     onerror="this.src='https://img.youtube.com/vi/${video.id}/hqdefault.jpg'"
+                     alt="${video.titulo}">
+                <div class="play-overlay">
+                    <i class="fas fa-play"></i>
+                </div>
+            </div>
+            <div class="video-info">
+                <h3 class="video-title">${video.titulo}</h3>
+                <div class="video-meta">
+                    <span class="video-duration">
+                        <i class="far fa-clock"></i>
+                        ${video.duracion}
+                    </span>
+                    <span class="video-category">${video.categoria}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Abrir video en modal
+function abrirVideo(videoId, titulo) {
+    const modal = document.getElementById('videoModal');
+    const player = document.getElementById('videoPlayer');
+    const modalTitle = document.getElementById('modalTitle');
+
+    modalTitle.textContent = titulo;
+    
+    // Cargar el iframe del video
+    player.innerHTML = `
+        <iframe 
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    `;
+
+    modal.classList.add('active');
+}
+
+// Cerrar modal de video
+function closeVideoModal() {
+    const modal = document.getElementById('videoModal');
+    const player = document.getElementById('videoPlayer');
+    
+    modal.classList.remove('active');
+    player.innerHTML = ''; // Detener la reproducción
+}
+
+// Mostrar mensaje de error
+function mostrarMensajeError() {
+    const grid = document.getElementById('videosGrid');
+    grid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: var(--spacing-2xl);">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--accent-orange); margin-bottom: var(--spacing-lg);"></i>
+            <h3>Error al cargar los videos</h3>
+            <p style="color: var(--text-muted);">Por favor, intenta nuevamente más tarde</p>
+        </div>
+    `;
+}
+</script>
+
 </body>
 </html>
